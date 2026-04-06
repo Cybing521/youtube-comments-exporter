@@ -1,0 +1,30 @@
+# Node
+node_modules
+.pnpm-store
+
+# Next.js / Vercel
+.next
+.vercel
+
+# Build outputs
+dist
+build
+output
+coverage
+playwright-report
+test-results
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Python
+__pycache__
+*.pyc
+
+# macOS
+.DS_Store
