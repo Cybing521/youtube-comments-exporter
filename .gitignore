@@ -22,12 +22,5 @@ test-results
 .env.test.local
 .env.production.local
 
-# Python
-__pycache__
-*.pyc
-
 # macOS
 .DS_Store
-
-# Local packaging leftovers
-YouTubeCommentsExporter.spec

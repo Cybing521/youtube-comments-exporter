@@ -11,6 +11,8 @@ interface ExportFormProps {
   onError: (message: string) => void;
 }
 
+const SAMPLE_VIDEO_URL = "https://www.youtube.com/watch?v=gtEROmL0NzQ";
+
 function validateYouTubeUrl(url: string) {
   const value = url.trim();
 
@@ -67,12 +69,48 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
   return (
     <form className="panel form-grid" onSubmit={handleSubmit} aria-busy={isSubmitting}>
       <div className="form-heading">
-        <div>
-          <p className="section-kicker">单视频导出</p>
-          <h2>输入链接，在线生成下载文件</h2>
-        </div>
-        <p className="form-note">粘贴一个视频链接，我们会为你准备 JSON、分层 Excel 和扁平 Excel 三份文件。</p>
+        <h2>输入链接，在线生成下载文件</h2>
       </div>
+      <section className="quickstart-panel" aria-label="第一次使用引导">
+        <div className="quickstart-copy">
+          <p className="section-kicker">第一次使用也能很快上手</p>
+          <p className="helper-text">
+            这个页面只做一件事：把一个公开视频链接变成结构化数据文件。你只需要准备自己的 API key 和一次验证。
+          </p>
+        </div>
+        <div className="quickstart-grid">
+          <article className="quickstart-card">
+            <strong>01</strong>
+            <span>准备一个公开视频链接</span>
+          </article>
+          <article className="quickstart-card">
+            <strong>02</strong>
+            <span>填入你自己的 YouTube API key</span>
+          </article>
+          <article className="quickstart-card">
+            <strong>03</strong>
+            <span>完成人机验证并开始导出</span>
+          </article>
+        </div>
+        <div className="quickstart-actions">
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => setUrl(SAMPLE_VIDEO_URL)}
+            disabled={isSubmitting}
+          >
+            填入示例链接
+          </button>
+          <details className="api-help">
+            <summary>还没有 API key？</summary>
+            <ol>
+              <li>打开 Google Cloud Console 并新建项目。</li>
+              <li>启用 YouTube Data API v3。</li>
+              <li>创建 API key 后贴回这里即可使用。</li>
+            </ol>
+          </details>
+        </div>
+      </section>
       <div className="field">
         <label htmlFor="youtube-url">YouTube 链接</label>
         <input

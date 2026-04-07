@@ -16,6 +16,7 @@
 - 支持一级评论和回复评论
 - 生成三种导出产物
 - 支持 Vercel Blob 上传和在线下载能力
+- 只保留 Web 版本，仓库结构已经按线上产品收缩
 
 ## Project Structure
 
@@ -24,8 +25,7 @@ app                      Next.js App Router 页面和 API 路由
 components               前端组件
 lib                      YouTube 评论抓取、导出和 Blob 上传核心
 docs                     架构、部署和计划文档
-tests                    Web 侧测试与历史 Python 测试
-src                      原始 Python 原型实现
+tests                    Web 侧测试
 ```
 
 ## Environment Variables
@@ -109,7 +109,5 @@ pnpm build
 
 当前还没有完成的上线前事项：
 
-- 在 Vercel 项目里确认 `Root Directory` 为空
-- 一次成功的 Vercel 生产部署
 - 在 Cloudflare Turnstile 后台补齐正式域名白名单
 - 用真实 YouTube 视频和用户自己的 API key 做一次线上导出验证

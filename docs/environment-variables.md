@@ -14,13 +14,6 @@ Cloudflare Turnstile site key used by the browser widget.
 
 Cloudflare Turnstile secret key used by the server-side Siteverify request.
 
-## Optional
-
-### `YOUTUBE_API_KEY`
-
-Only needed if you still run the legacy Python prototype under `src/`.
-The public Web export flow no longer reads this variable.
-
 ## Local Setup
 
 ```bash

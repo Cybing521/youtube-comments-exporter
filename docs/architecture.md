@@ -2,11 +2,13 @@
 
 ## Overview
 
-The project is split into two main layers:
+This repository now ships a single Web product. The main layers are:
 
 - `app`: the user-facing Next.js application and API routes
 - `components`: page-level and form components
 - `lib/export-core`: reusable TypeScript logic for YouTube comment export and file generation
+
+There is no desktop or Python runtime path in the active codebase anymore. The product boundary is a single Next.js app deployed to Vercel.
 
 ## Request Flow
 
