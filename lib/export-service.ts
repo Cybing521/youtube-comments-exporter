@@ -6,7 +6,13 @@ import {
 import { exportVideoComments } from "./export-core/export-comments";
 import { createYouTubeDataClient, extractVideoId } from "./export-core/youtube";
 import type { YouTubeClient } from "./export-core/types";
-import { uploadArtifact, type UploadedArtifact } from "./blob";
+import {
+  readExportCache,
+  uploadArtifact,
+  writeExportCache,
+  type ExportCacheEntry,
+  type UploadedArtifact,
+} from "./blob";
 import type { ExportProgressEvent } from "./export-types";
 
 export interface ExportJobInput {
@@ -33,6 +39,8 @@ export interface ExportJobResult {
 interface ExportServiceDependencies {
   createClient: (apiKey: string) => YouTubeClient;
   uploadArtifact: (filename: string, content: Buffer, contentType: string) => Promise<UploadedArtifact>;
+  readCache: (videoId: string, order: "relevance" | "time") => Promise<ExportCacheEntry | null>;
+  writeCache: (entry: ExportCacheEntry) => Promise<unknown>;
 }
 
 interface RunExportOptions {
@@ -41,7 +49,9 @@ interface RunExportOptions {
 
 const defaultDependencies: ExportServiceDependencies = {
   createClient: createYouTubeDataClient,
-  uploadArtifact
+  uploadArtifact,
+  readCache: readExportCache,
+  writeCache: writeExportCache,
 };
 
 export async function runExportAndUpload(
@@ -52,6 +62,43 @@ export async function runExportAndUpload(
   const emitProgress = options.onProgress ?? (() => undefined);
   const videoId = extractVideoId(input.url);
   const client = dependencies.createClient(input.apiKey);
+
+  emitProgress({
+    stage: "validating",
+    title: "正在校验 API key",
+    detail: "先确认这把 YouTube API key 可以正常访问官方接口。",
+  });
+
+  await client.validateApiKey(videoId);
+
+  emitProgress({
+    stage: "validating",
+    title: "正在检查缓存结果",
+    detail: "看看这个视频是否已经导出过可复用结果。",
+  });
+
+  let cached: ExportCacheEntry | null = null;
+
+  try {
+    cached = await dependencies.readCache(videoId, input.order);
+  } catch {
+    cached = null;
+  }
+
+  if (cached) {
+    emitProgress({
+      stage: "uploading-files",
+      title: "已命中缓存结果",
+      detail: "这个视频最近已经导出过，正在直接返回现成下载链接。",
+    });
+
+    return {
+      videoId: cached.videoId,
+      order: cached.order,
+      summary: cached.summary,
+      files: cached.files,
+    };
+  }
 
   emitProgress({
     stage: "fetching-comments",
@@ -132,7 +179,7 @@ export async function runExportAndUpload(
     detail: "三个文件都已上传完成，正在整理最终下载入口。",
   });
 
-  return {
+  const result = {
     videoId,
     order: input.order,
     summary: exported.summary,
@@ -142,4 +189,19 @@ export async function runExportAndUpload(
       flatExcelUrl: flatExcel.url
     }
   };
+
+  try {
+    await dependencies.writeCache({
+      ...result,
+      cachedAt: new Date().toISOString(),
+    });
+  } catch {
+    emitProgress({
+      stage: "uploading-files",
+      title: "下载结果已准备完成",
+      detail: "缓存保存失败了，但这次导出结果已经可正常下载。",
+    });
+  }
+
+  return result;
 }

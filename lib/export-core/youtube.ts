@@ -97,6 +97,22 @@ async function requestJson(endpoint: string, params: Record<string, string>) {
 
 export function createYouTubeDataClient(apiKey: string): YouTubeClient {
   return {
+    async validateApiKey(videoId: string): Promise<void> {
+      const params: Record<string, string> = {
+        part: "id",
+        id: videoId,
+        maxResults: "1",
+        key: apiKey,
+      };
+
+      try {
+        await requestJson("https://www.googleapis.com/youtube/v3/videos", params);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "YouTube API 请求失败";
+        throw new Error(`YouTube API Key 不可用：${message}`);
+      }
+    },
+
     async listCommentThreads(
       videoId: string,
       pageToken?: string,

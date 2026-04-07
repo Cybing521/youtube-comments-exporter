@@ -4,6 +4,10 @@ import { exportVideoComments } from "../../lib/export-core/export-comments";
 class FakeYouTubeClient {
   public commentsCalls: Array<{ parentId: string; pageToken?: string }> = [];
 
+  async validateApiKey() {
+    return undefined;
+  }
+
   async listCommentThreads(videoId: string, pageToken?: string, order = "relevance") {
     expect(videoId).toBe("video-1");
     expect(order).toBe("time");

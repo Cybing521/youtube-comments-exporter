@@ -12,7 +12,8 @@ function resolveErrorStatus(message: string) {
     message.startsWith("请先") ||
     message.startsWith("人机验证未通过") ||
     message.startsWith("人机验证主机名不匹配") ||
-    message.startsWith("无法从链接中提取")
+    message.startsWith("无法从链接中提取") ||
+    message.startsWith("YouTube API Key 不可用")
   ) {
     return 400;
   }

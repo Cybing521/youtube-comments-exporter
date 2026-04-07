@@ -56,6 +56,7 @@ export interface CommentRepliesPayload {
 }
 
 export interface YouTubeClient {
+  validateApiKey(videoId: string): Promise<void>;
   listCommentThreads(
     videoId: string,
     pageToken?: string,
