@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { CopyEmailButton } from "@/components/copy-email-button";
 import { ExportForm } from "@/components/export-form";
 import { ExportResults } from "@/components/export-results";
 import type { ExportResponse } from "@/lib/export-types";
@@ -14,10 +15,7 @@ export default function HomePage() {
     <main className="page-shell">
       <section className="hero panel">
         <div className="hero-topline">
-          <p className="eyebrow">在线导出工具</p>
-          <a className="hero-feedback-link" href="mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈">
-            邮箱反馈
-          </a>
+          <CopyEmailButton className="hero-feedback-link" defaultLabel="邮箱反馈" />
         </div>
         <div className="hero-content">
           <div className="hero-main">
@@ -32,7 +30,6 @@ export default function HomePage() {
           <aside className="hero-sidecard" aria-label="快速价值说明">
             <strong>第一次来也能直接用</strong>
             <p>三步完成：填链接、贴 API key、做人机验证。导出完成后就能直接下载，或者截图发给别人。</p>
-            <a href="mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈">给我发需求或反馈</a>
           </aside>
         </div>
       </section>

@@ -106,7 +106,6 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
       </div>
       <section className="quickstart-panel" aria-label="第一次使用引导">
         <div className="quickstart-copy">
-          <p className="section-kicker">第一次使用也能很快上手</p>
           <p className="helper-text">
             这个页面只做一件事：把一个公开视频链接变成结构化数据文件。你只需要准备自己的 API key 和一次验证。
           </p>

@@ -2,11 +2,12 @@
 
 import "@testing-library/jest-dom/vitest";
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, vi } from "vitest";
 import HomePage from "../../app/page";
 
 const SAVED_API_KEY_STORAGE = "youtube-comments-exporter-api-key";
+const writeText = vi.fn(async () => undefined);
 
 vi.mock("@marsidev/react-turnstile", () => ({
   Turnstile: () => <div>Turnstile 占位</div>,
@@ -15,24 +16,25 @@ vi.mock("@marsidev/react-turnstile", () => ({
 describe("homepage", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    writeText.mockClear();
+    Object.assign(navigator, {
+      clipboard: {
+        writeText,
+      },
+    });
   });
 
   it("renders the Chinese export shell", () => {
     render(<HomePage />);
 
     expect(screen.getByText("YouTube 评论导出")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "邮箱反馈" })).toHaveAttribute(
-      "href",
-      "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
-    );
-    expect(screen.getByText("第一次使用也能很快上手")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "邮箱反馈" })).toBeInTheDocument();
+    expect(screen.queryByText("在线导出工具")).not.toBeInTheDocument();
+    expect(screen.queryByText("第一次使用也能很快上手")).not.toBeInTheDocument();
     expect(screen.getByText("准备一个公开视频链接")).toBeInTheDocument();
     expect(screen.getByText("填入你自己的 YouTube API key")).toBeInTheDocument();
     expect(screen.getByText("完成人机验证并开始导出")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "给我发需求或反馈" })).toHaveAttribute(
-      "href",
-      "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
-    );
+    expect(screen.queryByText("给我发需求或反馈")).not.toBeInTheDocument();
     expect(screen.getByLabelText("YouTube 链接")).toBeInTheDocument();
     expect(screen.getByLabelText("YouTube API Key")).toBeInTheDocument();
     expect(screen.getByText(/你的 API key 只用于本次导出请求/)).toBeInTheDocument();
@@ -49,6 +51,19 @@ describe("homepage", () => {
 
     expect(screen.getByLabelText("YouTube 链接")).toHaveValue("https://www.youtube.com/watch?v=gtEROmL0NzQ");
     expect(screen.getByText("示例链接已填入")).toBeInTheDocument();
+  });
+
+  it("copies the feedback email from the hero button", async () => {
+    render(<HomePage />);
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "邮箱反馈" }));
+    });
+
+    expect(writeText).toHaveBeenCalledWith("cyibin06@gmail.com");
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "邮箱已复制" })).toBeInTheDocument();
+    });
   });
 
   it("restores and persists the user's api key in local storage", () => {

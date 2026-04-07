@@ -6,6 +6,8 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import HomePage from "../../app/page";
 
+const writeText = vi.fn(async () => undefined);
+
 vi.mock("@marsidev/react-turnstile", () => ({
   Turnstile: ({ onSuccess }: { onSuccess?: (token: string) => void }) => (
     <button type="button" onClick={() => onSuccess?.("turnstile-token")}>
@@ -17,6 +19,12 @@ vi.mock("@marsidev/react-turnstile", () => ({
 describe("export flow", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    writeText.mockClear();
+    Object.assign(navigator, {
+      clipboard: {
+        writeText,
+      },
+    });
   });
 
   afterEach(() => {
@@ -156,11 +164,7 @@ describe("export flow", () => {
     expect(screen.getByText("2,626 条评论已整理完成")).toBeInTheDocument();
     expect(screen.getAllByText("工具链接").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("cybing.top")).toBeInTheDocument();
-    expect(screen.getAllByText("邮箱反馈").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole("link", { name: "发邮件到 cyibin06@gmail.com" })).toHaveAttribute(
-      "href",
-      "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
-    );
+    expect(screen.getByRole("button", { name: "复制反馈邮箱" })).toBeInTheDocument();
     expect(screen.getByText("原始数据")).toBeInTheDocument();
     expect(screen.getByText("阅读整理")).toBeInTheDocument();
     expect(screen.getByText("分析表格")).toBeInTheDocument();
@@ -178,6 +182,11 @@ describe("export flow", () => {
     expect(screen.getByText("评论分析")).toBeInTheDocument();
     expect(screen.getByText("运营复盘")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "下载海报 PNG" })).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "复制反馈邮箱" }));
+    });
+    expect(writeText).toHaveBeenCalledWith("cyibin06@gmail.com");
 
     expect(screen.getByRole("link", { name: /下载 JSON/ })).toHaveAttribute(
       "href",

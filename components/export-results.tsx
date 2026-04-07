@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { CopyEmailButton } from "./copy-email-button";
 import type { ExportResponse } from "../lib/export-types";
 
 interface ExportResultsProps {
@@ -386,7 +387,7 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
                     </div>
                     <div>
                       <label>反馈邮箱</label>
-                      <a href="mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈">{SHARE_EMAIL}</a>
+                      <span>{SHARE_EMAIL}</span>
                     </div>
                   </div>
                 </article>
@@ -415,8 +416,8 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
           </div>
         </div>
         <p className="results-feedback">
-          想提需求或反馈问题？
-          <a href="mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈">发邮件到 cyibin06@gmail.com</a>
+          <span>想提需求或反馈问题？</span>
+          <CopyEmailButton className="inline-text-button" defaultLabel="复制反馈邮箱" copiedLabel="邮箱已复制" />
         </p>
       </section>
     );
