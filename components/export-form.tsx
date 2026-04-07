@@ -12,6 +12,7 @@ interface ExportFormProps {
 }
 
 const SAMPLE_VIDEO_URL = "https://www.youtube.com/watch?v=gtEROmL0NzQ";
+const SAVED_API_KEY_STORAGE = "youtube-comments-exporter-api-key";
 
 function validateYouTubeUrl(url: string) {
   const value = url.trim();
@@ -37,6 +38,23 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
   const turnstileSiteKey =
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ??
     (process.env.NODE_ENV === "test" ? "1x00000000000000000000AA" : "");
+
+  React.useEffect(() => {
+    const savedApiKey = window.localStorage.getItem(SAVED_API_KEY_STORAGE)?.trim();
+
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (!apiKey.trim()) {
+      window.localStorage.removeItem(SAVED_API_KEY_STORAGE);
+      return;
+    }
+
+    window.localStorage.setItem(SAVED_API_KEY_STORAGE, apiKey.trim());
+  }, [apiKey]);
 
   React.useEffect(() => {
     if (!sampleApplied) {
@@ -155,7 +173,19 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
           disabled={isSubmitting}
           onChange={(event) => setApiKey(event.target.value)}
         />
-        <p className="helper-text">你的 API key 只用于本次导出请求，配额也会计入你自己的 Google Cloud 项目。</p>
+        <div className="field-note-row">
+          <p className="helper-text">你的 API key 只用于本次导出请求，配额也会计入你自己的 Google Cloud 项目。</p>
+          {apiKey.trim() ? (
+            <button
+              type="button"
+              className="inline-text-button"
+              onClick={() => setApiKey("")}
+              disabled={isSubmitting}
+            >
+              清除已保存 key
+            </button>
+          ) : null}
+        </div>
       </div>
       <div className="field verification-field">
         <label htmlFor="turnstile-widget">安全验证</label>

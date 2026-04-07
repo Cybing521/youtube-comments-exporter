@@ -6,11 +6,17 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { vi } from "vitest";
 import HomePage from "../../app/page";
 
+const SAVED_API_KEY_STORAGE = "youtube-comments-exporter-api-key";
+
 vi.mock("@marsidev/react-turnstile", () => ({
   Turnstile: () => <div>Turnstile 占位</div>,
 }));
 
 describe("homepage", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it("renders the Chinese export shell", () => {
     render(<HomePage />);
 
@@ -43,5 +49,20 @@ describe("homepage", () => {
 
     expect(screen.getByLabelText("YouTube 链接")).toHaveValue("https://www.youtube.com/watch?v=gtEROmL0NzQ");
     expect(screen.getByText("示例链接已填入")).toBeInTheDocument();
+  });
+
+  it("restores and persists the user's api key in local storage", () => {
+    window.localStorage.setItem(SAVED_API_KEY_STORAGE, "AIza-saved");
+
+    render(<HomePage />);
+
+    const apiKeyInput = screen.getByLabelText("YouTube API Key");
+    expect(apiKeyInput).toHaveValue("AIza-saved");
+
+    fireEvent.change(apiKeyInput, {
+      target: { value: "AIza-updated" },
+    });
+
+    expect(window.localStorage.getItem(SAVED_API_KEY_STORAGE)).toBe("AIza-updated");
   });
 });

@@ -13,18 +13,22 @@ const LOADING_STAGES = [
   {
     title: "正在校验输入信息",
     detail: "确认链接、API key 和安全验证已经准备好。",
+    minSeconds: 0,
   },
   {
     title: "正在请求评论数据",
     detail: "开始获取一级评论并补全回复内容。",
+    minSeconds: 4,
   },
   {
     title: "正在生成导出文件",
     detail: "整理 JSON、分层 Excel 和扁平 Excel。",
+    minSeconds: 10,
   },
   {
     title: "正在准备下载结果",
     detail: "上传文件并整理最终下载入口。",
+    minSeconds: 18,
   },
 ];
 
@@ -190,20 +194,20 @@ function createPosterDownloadUrl(result: ExportResponse) {
 }
 
 export function ExportResults({ status, error, result }: ExportResultsProps) {
-  const [loadingStageIndex, setLoadingStageIndex] = React.useState(0);
+  const [loadingSeconds, setLoadingSeconds] = React.useState(0);
   const [isPosterVisible, setIsPosterVisible] = React.useState(false);
   const [posterDownloadUrl, setPosterDownloadUrl] = React.useState<string | null>(null);
   const [posterError, setPosterError] = React.useState("");
 
   React.useEffect(() => {
     if (status !== "loading") {
-      setLoadingStageIndex(0);
+      setLoadingSeconds(0);
       return;
     }
 
     const timer = window.setInterval(() => {
-      setLoadingStageIndex((current) => Math.min(current + 1, LOADING_STAGES.length - 1));
-    }, 850);
+      setLoadingSeconds((current) => current + 1);
+    }, 1000);
 
     return () => {
       window.clearInterval(timer);
@@ -221,7 +225,14 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
   }, [status, result]);
 
   if (status === "loading") {
-    const activeStage = LOADING_STAGES[loadingStageIndex];
+    const activeStageIndex = LOADING_STAGES.reduce((current, stage, index) => {
+      if (loadingSeconds >= stage.minSeconds) {
+        return index;
+      }
+
+      return current;
+    }, 0);
+    const activeStage = LOADING_STAGES[activeStageIndex];
 
     return (
       <section className="panel results-panel">
@@ -231,10 +242,18 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
             <p className="section-kicker">导出进行中</p>
             <h3>{activeStage.title}</h3>
             <p>{activeStage.detail}</p>
+            <div className="progress-meta">
+              <strong>已等待 {loadingSeconds} 秒</strong>
+              {loadingSeconds >= 10 ? (
+                <span>评论较多的视频通常需要 15 到 30 秒，这不是卡住了。页面会在完成后自动显示下载按钮。</span>
+              ) : (
+                <span>我们会在服务端继续抓取评论、补全回复并生成文件，完成后自动展示下载结果。</span>
+              )}
+            </div>
           </div>
           <ol className="progress-rail">
             {LOADING_STAGES.map((stage, index) => (
-              <li key={stage.title} className={index <= loadingStageIndex ? "active" : undefined}>
+              <li key={stage.title} className={index <= activeStageIndex ? "active" : undefined}>
                 <span>{stage.title}</span>
               </li>
             ))}

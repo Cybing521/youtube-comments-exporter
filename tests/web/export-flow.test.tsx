@@ -48,19 +48,26 @@ describe("export flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "开始导出" }));
 
     expect(screen.getByRole("heading", { name: "正在校验输入信息" })).toBeInTheDocument();
+    expect(screen.getByText("已等待 0 秒")).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(900);
+      vi.advanceTimersByTime(1100);
+    });
+    expect(screen.getByText("已等待 1 秒")).toBeInTheDocument();
+
+    await act(async () => {
+      vi.advanceTimersByTime(3900);
     });
     expect(screen.getByRole("heading", { name: "正在请求评论数据" })).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(900);
+      vi.advanceTimersByTime(6000);
     });
     expect(screen.getByRole("heading", { name: "正在生成导出文件" })).toBeInTheDocument();
+    expect(screen.getByText("评论较多的视频通常需要 15 到 30 秒，这不是卡住了。页面会在完成后自动显示下载按钮。")).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(900);
+      vi.advanceTimersByTime(8000);
     });
     expect(screen.getByRole("heading", { name: "正在准备下载结果" })).toBeInTheDocument();
 

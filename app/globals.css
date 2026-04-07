@@ -361,6 +361,14 @@ input:disabled {
   gap: 8px;
 }
 
+.field-note-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
 .field label {
   font-size: 0.96rem;
   font-weight: 600;
@@ -486,6 +494,27 @@ input:disabled {
 
 .progress-copy p {
   color: var(--muted);
+}
+
+.progress-meta {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(201, 214, 230, 0.82);
+}
+
+.progress-meta strong {
+  color: var(--accent-strong);
+  font-size: 0.95rem;
+}
+
+.progress-meta span {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
 }
 
 .progress-rail {
@@ -874,6 +903,20 @@ input:disabled {
 
 .error-text {
   color: var(--error);
+}
+
+.inline-text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inline-text-button:hover {
+  text-decoration: underline;
 }
 
 .next-actions {
