@@ -1,6 +1,8 @@
 import { normalizeReply, normalizeThread } from "./normalize";
 import type { ExportResult, Reply, SortOrder, YouTubeClient } from "./types";
 
+const REPLY_FETCH_CONCURRENCY = 4;
+
 async function fetchMissingReplies(
   client: YouTubeClient,
   parentCommentId: string,
@@ -36,6 +38,25 @@ async function fetchMissingReplies(
   return replies;
 }
 
+async function fillMissingReplies(client: YouTubeClient, threads: ExportResult["threads"]) {
+  let index = 0;
+
+  async function worker() {
+    while (index < threads.length) {
+      const currentIndex = index;
+      index += 1;
+      const thread = threads[currentIndex];
+
+      if (thread.replyCount > thread.replies.length) {
+        thread.replies = await fetchMissingReplies(client, thread.commentId, thread.replies);
+      }
+    }
+  }
+
+  const workerCount = Math.min(REPLY_FETCH_CONCURRENCY, threads.length);
+  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+}
+
 export async function exportVideoComments(
   client: YouTubeClient,
   videoId: string,
@@ -46,16 +67,10 @@ export async function exportVideoComments(
 
   while (true) {
     const payload = await client.listCommentThreads(videoId, pageToken, order);
+    const pageThreads = (payload.items ?? []).map((item) => normalizeThread(item));
 
-    for (const item of payload.items ?? []) {
-      const normalized = normalizeThread(item);
-
-      if (normalized.replyCount > normalized.replies.length) {
-        normalized.replies = await fetchMissingReplies(client, normalized.commentId, normalized.replies);
-      }
-
-      threads.push(normalized);
-    }
+    await fillMissingReplies(client, pageThreads);
+    threads.push(...pageThreads);
 
     pageToken = payload.nextPageToken;
     if (!pageToken) {

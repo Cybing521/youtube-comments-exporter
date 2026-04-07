@@ -8,26 +8,42 @@ function buildStem(videoId: string, order: SortOrder): string {
   return `${videoId}.${order}.comments`;
 }
 
-export async function buildExportArtifacts(
-  exportResult: ExportResult & { order: SortOrder }
-): Promise<ExportArtifacts> {
+export function buildJsonArtifact(exportResult: ExportResult & { order: SortOrder }) {
   const stem = buildStem(exportResult.videoId, exportResult.order);
 
   return {
-    json: {
-      filename: `${stem}.json`,
-      content: Buffer.from(JSON.stringify(exportResult, null, 2), "utf8"),
-      contentType: JSON_MIME
-    },
-    threadedExcel: {
-      filename: `${stem}.xlsx`,
-      content: buildThreadedWorkbook(exportResult),
-      contentType: XLSX_MIME
-    },
-    flatExcel: {
-      filename: `${stem}.flat.xlsx`,
-      content: buildFlatWorkbook(exportResult),
-      contentType: XLSX_MIME
-    }
+    filename: `${stem}.json`,
+    content: Buffer.from(JSON.stringify(exportResult, null, 2), "utf8"),
+    contentType: JSON_MIME
+  };
+}
+
+export function buildThreadedExcelArtifact(exportResult: ExportResult & { order: SortOrder }) {
+  const stem = buildStem(exportResult.videoId, exportResult.order);
+
+  return {
+    filename: `${stem}.xlsx`,
+    content: buildThreadedWorkbook(exportResult),
+    contentType: XLSX_MIME
+  };
+}
+
+export function buildFlatExcelArtifact(exportResult: ExportResult & { order: SortOrder }) {
+  const stem = buildStem(exportResult.videoId, exportResult.order);
+
+  return {
+    filename: `${stem}.flat.xlsx`,
+    content: buildFlatWorkbook(exportResult),
+    contentType: XLSX_MIME
+  };
+}
+
+export async function buildExportArtifacts(
+  exportResult: ExportResult & { order: SortOrder }
+): Promise<ExportArtifacts> {
+  return {
+    json: buildJsonArtifact(exportResult),
+    threadedExcel: buildThreadedExcelArtifact(exportResult),
+    flatExcel: buildFlatExcelArtifact(exportResult)
   };
 }

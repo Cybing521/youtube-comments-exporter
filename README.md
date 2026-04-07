@@ -6,15 +6,15 @@
 - `threaded Excel`
 - `flat Excel`
 
-这个仓库当前正从本地 Python 桌面原型迁移到可部署在 Vercel 的 Next.js Web 应用。
+这个仓库已经整理成适合部署在 Vercel 的 Next.js Web 应用，适合继续在线迭代和公开开源。
 
 ## Features
 
 - 中文界面，适合直接给非技术用户使用
-- 服务端导出，不暴露前端逻辑细节
+- 公开网页只输入视频链接，API Key 保留在服务端环境变量
 - 支持一级评论和回复评论
 - 生成三种导出产物
-- 预留 Vercel Blob 上传和在线下载能力
+- 支持 Vercel Blob 上传和在线下载能力
 
 ## Project Structure
 
@@ -28,7 +28,13 @@ src                       原始 Python 原型实现
 
 ## Environment Variables
 
-复制 `.env.example` 并配置：
+本地开发时，请在 `apps/web` 下创建环境变量文件：
+
+```bash
+cp apps/web/.env.example apps/web/.env.local
+```
+
+然后在 `apps/web/.env.local` 里填写：
 
 ```bash
 YOUTUBE_API_KEY=your_youtube_data_api_key
@@ -43,6 +49,7 @@ pnpm --dir apps/web dev
 ```
 
 打开 [http://localhost:3000](http://localhost:3000)。
+页面只需要输入 YouTube 链接；`YOUTUBE_API_KEY` 由服务端读取。
 
 ## Testing
 
@@ -55,28 +62,29 @@ pnpm vitest run tests/workspace/bootstrap.test.ts tests/web/homepage.test.tsx te
 运行生产构建检查：
 
 ```bash
-rm -rf apps/web/.next
-pnpm --dir apps/web build
+pnpm build
 ```
 
 ## Vercel Deployment
 
 1. 把仓库推到 GitHub。
 2. 在 Vercel 中 `Add New Project` 并导入仓库。
-3. 配置环境变量：
+3. 把 `Root Directory` 设为 `apps/web`。这个项目在仓库里是 monorepo 结构，但真正的 Next.js 应用根目录是 `apps/web`。
+4. 配置环境变量：
    - `YOUTUBE_API_KEY`
    - `BLOB_READ_WRITE_TOKEN`
-4. 先完成一次默认 `*.vercel.app` 生产部署。
-5. 在旧项目里移除：
-   - `www.cybing.top`
-   - `cybing.top`
-6. 在新项目里添加：
-   - `www.cybing.top`
-   - `cybing.top` -> 重定向到 `www.cybing.top`
-7. 验证：
-   - `https://www.cybing.top`
-   - `https://cybing.top`
-   - 页面发起一次真实导出
+5. 在项目中启用 Vercel Blob，确保 `BLOB_READ_WRITE_TOKEN` 出现在环境变量中。
+6. 先完成一次默认 `*.vercel.app` 生产部署。
+7. 验证默认域名页面可打开，并能成功导出一次真实视频评论。
+
+## Custom Domain Example
+
+如果你要把这个项目切到自己的域名，可以按下面的方式做：
+
+1. 在旧项目里移除原有域名。
+2. 在新项目里添加你的正式域名。
+3. 可选地把根域名重定向到 `www` 子域名。
+4. 域名生效后，用正式域名再次跑一遍导出验证。
 
 ## Current Status
 
@@ -85,12 +93,12 @@ pnpm --dir apps/web build
 - Node workspace 和 Next.js Web 壳子
 - TypeScript 版评论导出核心
 - JSON / Excel 产物生成
-- `/api/export` 路由骨架
-- 前端提交与结果展示的最小交互
+- `/api/export` 路由和服务端环境变量接入
+- 前端提交、导出结果摘要和下载交互
+- `README.md`、`.gitignore`、部署文档和环境变量文档
 
 当前还没有完成的上线前事项：
 
-- 真实 Blob 上传联调
-- 真实 YouTube API 联调
-- 更完整的 UI 打磨
-- 开源项目补充 `LICENSE`、截图和部署文档
+- 在 Vercel 项目里把 `Root Directory` 正式设为 `apps/web`
+- 一次成功的 Vercel 生产部署
+- 用真实 YouTube 视频做一次线上导出验证

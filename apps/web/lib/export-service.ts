@@ -1,4 +1,8 @@
-import { buildExportArtifacts } from "../../../packages/export-core/src/artifacts";
+import {
+  buildFlatExcelArtifact,
+  buildJsonArtifact,
+  buildThreadedExcelArtifact
+} from "../../../packages/export-core/src/artifacts";
 import { exportVideoComments } from "../../../packages/export-core/src/export-comments";
 import { createYouTubeDataClient, extractVideoId } from "../../../packages/export-core/src/youtube";
 import type { YouTubeClient } from "../../../packages/export-core/src/types";
@@ -42,28 +46,28 @@ export async function runExportAndUpload(
   const videoId = extractVideoId(input.url);
   const client = dependencies.createClient(input.apiKey);
   const exported = await exportVideoComments(client, videoId, input.order);
-  const artifacts = await buildExportArtifacts({
+  const exportResult = {
     ...exported,
     order: input.order
-  });
-
-  const [json, threadedExcel, flatExcel] = await Promise.all([
-    dependencies.uploadArtifact(
-      artifacts.json.filename,
-      artifacts.json.content,
-      artifacts.json.contentType
-    ),
-    dependencies.uploadArtifact(
-      artifacts.threadedExcel.filename,
-      artifacts.threadedExcel.content,
-      artifacts.threadedExcel.contentType
-    ),
-    dependencies.uploadArtifact(
-      artifacts.flatExcel.filename,
-      artifacts.flatExcel.content,
-      artifacts.flatExcel.contentType
-    )
-  ]);
+  };
+  const jsonArtifact = buildJsonArtifact(exportResult);
+  const json = await dependencies.uploadArtifact(
+    jsonArtifact.filename,
+    jsonArtifact.content,
+    jsonArtifact.contentType
+  );
+  const threadedExcelArtifact = buildThreadedExcelArtifact(exportResult);
+  const threadedExcel = await dependencies.uploadArtifact(
+    threadedExcelArtifact.filename,
+    threadedExcelArtifact.content,
+    threadedExcelArtifact.contentType
+  );
+  const flatExcelArtifact = buildFlatExcelArtifact(exportResult);
+  const flatExcel = await dependencies.uploadArtifact(
+    flatExcelArtifact.filename,
+    flatExcelArtifact.content,
+    flatExcelArtifact.contentType
+  );
 
   return {
     videoId,

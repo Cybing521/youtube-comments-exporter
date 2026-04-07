@@ -43,24 +43,24 @@ describe("export flow", () => {
     fireEvent.change(screen.getByLabelText("YouTube 链接"), {
       target: { value: "https://www.youtube.com/watch?v=gtEROmL0NzQ" },
     });
-    fireEvent.change(screen.getByLabelText("API 密钥"), {
-      target: { value: "AIza-test" },
-    });
     fireEvent.click(screen.getByRole("button", { name: "开始导出" }));
 
     await waitFor(() => {
-      expect(screen.getByText("导出完成")).toBeInTheDocument();
+      expect(screen.getByText(/导出完成/)).toBeInTheDocument();
     });
 
-    expect(screen.getByRole("link", { name: "下载 JSON" })).toHaveAttribute(
+    expect(screen.getByText("2,626")).toBeInTheDocument();
+    expect(screen.getByText("保留最完整的结构化原始数据，适合继续处理或接入脚本。")).toBeInTheDocument();
+
+    expect(screen.getByRole("link", { name: /下载 JSON/ })).toHaveAttribute(
       "href",
       "https://blob.example/json",
     );
-    expect(screen.getByRole("link", { name: "下载分层 Excel" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /下载分层 Excel/ })).toHaveAttribute(
       "href",
       "https://blob.example/threaded",
     );
-    expect(screen.getByRole("link", { name: "下载扁平 Excel" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /下载扁平 Excel/ })).toHaveAttribute(
       "href",
       "https://blob.example/flat",
     );

@@ -5,6 +5,9 @@ import type {
   YouTubeClient
 } from "./types";
 
+const RETRYABLE_STATUS_CODES = new Set([429, 500, 502, 503, 504]);
+const MAX_ATTEMPTS = 3;
+
 export function extractVideoId(urlOrVideoId: string): string {
   if (!urlOrVideoId.includes("youtube.com") && !urlOrVideoId.includes("youtu.be")) {
     return urlOrVideoId;
@@ -16,24 +19,80 @@ export function extractVideoId(urlOrVideoId: string): string {
   }
 
   const videoId = parsed.searchParams.get("v");
-  if (!videoId) {
-    throw new Error("无法从链接中提取视频 ID");
+  if (videoId) {
+    return videoId;
   }
 
-  return videoId;
+  const [, kind, candidate] = parsed.pathname.split("/");
+  if (candidate && ["shorts", "embed", "live"].includes(kind)) {
+    return candidate;
+  }
+
+  throw new Error("无法从链接中提取视频 ID");
+}
+
+async function sleep(milliseconds: number) {
+  await new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+async function readYouTubeApiError(response: Response) {
+  try {
+    const payload = (await response.json()) as {
+      error?: {
+        message?: string;
+      };
+    };
+
+    return payload.error?.message;
+  } catch {
+    return undefined;
+  }
 }
 
 async function requestJson(endpoint: string, params: Record<string, string>) {
-  const response = await fetch(`${endpoint}?${new URLSearchParams(params).toString()}`, {
-    method: "GET",
-    cache: "no-store"
-  });
+  let attempt = 0;
+  let lastError: Error | undefined;
 
-  if (!response.ok) {
-    throw new Error(`YouTube API 请求失败：${response.status}`);
+  while (attempt < MAX_ATTEMPTS) {
+    let response: Response;
+
+    try {
+      response = await fetch(`${endpoint}?${new URLSearchParams(params).toString()}`, {
+        method: "GET",
+        cache: "no-store"
+      });
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error("YouTube API 请求失败");
+      if (attempt >= MAX_ATTEMPTS - 1) {
+        break;
+      }
+
+      await sleep(200 * 2 ** attempt);
+      attempt += 1;
+      continue;
+    }
+
+    if (response.ok) {
+      return response.json();
+    }
+
+    const message = await readYouTubeApiError(response);
+    lastError = new Error(
+      message ? `YouTube API 请求失败：${response.status} ${message}` : `YouTube API 请求失败：${response.status}`
+    );
+
+    const shouldRetry = RETRYABLE_STATUS_CODES.has(response.status) && attempt < MAX_ATTEMPTS - 1;
+    if (!shouldRetry) {
+      throw lastError;
+    }
+
+    await sleep(200 * 2 ** attempt);
+    attempt += 1;
   }
 
-  return response.json();
+  throw lastError ?? new Error("YouTube API 请求失败");
 }
 
 export function createYouTubeDataClient(apiKey: string): YouTubeClient {

@@ -1,17 +1,30 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
+
+const originalApiKey = process.env.YOUTUBE_API_KEY;
+
+afterEach(() => {
+  if (originalApiKey === undefined) {
+    delete process.env.YOUTUBE_API_KEY;
+  } else {
+    process.env.YOUTUBE_API_KEY = originalApiKey;
+  }
+});
 
 describe("POST /api/export", () => {
-  it("returns export summary and blob urls", async () => {
-    const { handleExportRequest } = await import("../../apps/web/lib/export-request");
+  it("returns export summary and blob urls with server-side api key", async () => {
+    process.env.YOUTUBE_API_KEY = "AIza-server";
+    const { handleExportRequest } = await import("../../apps/web/lib/handle-export-request");
 
     const data = await handleExportRequest(
       {
         url: "https://www.youtube.com/watch?v=gtEROmL0NzQ",
-        apiKey: "AIza-test",
         order: "time"
       },
       {
-        exportArtifacts: async () => ({
+        exportArtifacts: async (input) => {
+          expect(input.apiKey).toBe("AIza-server");
+
+          return {
           videoId: "gtEROmL0NzQ",
           order: "time",
           summary: {
@@ -24,7 +37,8 @@ describe("POST /api/export", () => {
             threadedExcelUrl: "https://blob.example.com/gtEROmL0NzQ.time.comments.xlsx",
             flatExcelUrl: "https://blob.example.com/gtEROmL0NzQ.time.comments.flat.xlsx"
           }
-        })
+        };
+      }
       }
     );
 
@@ -35,7 +49,18 @@ describe("POST /api/export", () => {
   });
 
   it("rejects missing url", async () => {
-    const { handleExportRequest } = await import("../../apps/web/lib/export-request");
+    process.env.YOUTUBE_API_KEY = "AIza-server";
+    const { handleExportRequest } = await import("../../apps/web/lib/handle-export-request");
     await expect(handleExportRequest({})).rejects.toThrow("缺少 YouTube 链接");
+  });
+
+  it("rejects missing server api key", async () => {
+    delete process.env.YOUTUBE_API_KEY;
+    const { handleExportRequest } = await import("../../apps/web/lib/handle-export-request");
+    await expect(
+      handleExportRequest({
+        url: "https://www.youtube.com/watch?v=gtEROmL0NzQ",
+      }),
+    ).rejects.toThrow("服务端未配置 YOUTUBE_API_KEY");
   });
 });

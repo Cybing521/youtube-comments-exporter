@@ -7,7 +7,7 @@ export async function uploadArtifact(filename: string, content: Buffer, contentT
   const { put } = await import("@vercel/blob");
   const blob = await put(filename, content, {
     access: "public",
-    addRandomSuffix: false,
+    addRandomSuffix: true,
     contentType
   });
 

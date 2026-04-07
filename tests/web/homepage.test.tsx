@@ -11,7 +11,7 @@ describe("homepage", () => {
 
     expect(screen.getByText("YouTube 评论导出")).toBeInTheDocument();
     expect(screen.getByLabelText("YouTube 链接")).toBeInTheDocument();
-    expect(screen.getByLabelText("API 密钥")).toBeInTheDocument();
+    expect(screen.getByText("粘贴一个视频链接，我们会为你准备 JSON、分层 Excel 和扁平 Excel 三份文件。")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "开始导出" })).toBeInTheDocument();
   });
 });
