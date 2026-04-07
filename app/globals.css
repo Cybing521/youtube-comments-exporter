@@ -134,6 +134,7 @@ input:disabled {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(242, 248, 255, 0.88)),
     radial-gradient(circle at top right, rgba(33, 112, 201, 0.1), transparent 38%);
+  overflow: hidden;
 }
 
 .quickstart-copy {
@@ -156,11 +157,20 @@ input:disabled {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(201, 214, 230, 0.78);
   transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+  animation: float-up 560ms ease both;
 }
 
 .quickstart-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 34px rgba(85, 111, 145, 0.12);
+}
+
+.quickstart-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.quickstart-card:nth-child(3) {
+  animation-delay: 160ms;
 }
 
 .quickstart-card strong {
@@ -181,6 +191,27 @@ input:disabled {
   align-items: start;
   justify-content: space-between;
   gap: 14px;
+}
+
+.sample-feedback {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(31, 139, 107, 0.08);
+  color: var(--success);
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  pointer-events: none;
+  transition: opacity 260ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sample-feedback.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 .ghost-button {
@@ -207,12 +238,36 @@ input:disabled {
   border-radius: 18px;
   border: 1px solid rgba(201, 214, 230, 0.82);
   background: rgba(255, 255, 255, 0.76);
+  transition: border-color 220ms ease, box-shadow 220ms ease, background 220ms ease;
 }
 
 .api-help summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   cursor: pointer;
   font-weight: 700;
   color: var(--text);
+}
+
+.api-help summary::-webkit-details-marker {
+  display: none;
+}
+
+.api-help summary::after {
+  content: "↗";
+  color: var(--accent-strong);
+  transition: transform 220ms ease;
+}
+
+.api-help[open] {
+  border-color: rgba(33, 112, 201, 0.22);
+  box-shadow: 0 18px 34px rgba(85, 111, 145, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.api-help[open] summary::after {
+  transform: rotate(135deg);
 }
 
 .api-help ol {
@@ -220,6 +275,7 @@ input:disabled {
   padding: 0;
   color: var(--muted);
   line-height: 1.7;
+  animation: float-up 260ms ease both;
 }
 
 .field {
@@ -247,6 +303,11 @@ input:disabled {
   border-color: rgba(33, 112, 201, 0.42);
   box-shadow: 0 0 0 4px rgba(33, 112, 201, 0.1);
   transform: translateY(-1px);
+}
+
+.field.sample-applied input {
+  border-color: rgba(31, 139, 107, 0.28);
+  box-shadow: 0 0 0 4px rgba(31, 139, 107, 0.08);
 }
 
 .verification-field {
@@ -390,10 +451,21 @@ input:disabled {
 }
 
 .stat-card {
+  display: grid;
+  gap: 8px;
   padding: 18px;
   border-radius: 20px;
   border: 1px solid rgba(201, 214, 230, 0.8);
   background: rgba(255, 255, 255, 0.72);
+  animation: float-up 560ms ease both;
+}
+
+.stat-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+.stat-card:nth-child(3) {
+  animation-delay: 160ms;
 }
 
 .stat-card span {
@@ -417,23 +489,77 @@ input:disabled {
   border: 1px solid rgba(31, 139, 107, 0.14);
   background:
     radial-gradient(circle at top right, rgba(31, 139, 107, 0.12), transparent 30%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(238, 250, 245, 0.92));
+    radial-gradient(circle at bottom left, rgba(33, 112, 201, 0.12), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(238, 250, 245, 0.92));
 }
 
 .result-copy h2 {
   margin: 8px 0 8px;
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
 .result-copy p {
   color: var(--muted);
 }
 
-.result-ready {
-  padding: 12px 16px;
+.result-subtitle {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 12px;
   border-radius: 999px;
+  background: rgba(31, 139, 107, 0.08);
+  color: var(--success) !important;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.result-link-callout {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(33, 112, 201, 0.14);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.result-link-callout span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.result-link-callout a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.result-ready {
+  display: grid;
+  gap: 8px;
+  min-width: 200px;
+  padding: 16px 18px;
+  border-radius: 22px;
   background: rgba(31, 139, 107, 0.1);
   color: var(--success);
   font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(31, 139, 107, 0.12);
+}
+
+.result-ready span {
+  font-size: 1rem;
+}
+
+.result-ready small {
+  color: rgba(32, 48, 68, 0.7);
+  font-size: 0.85rem;
+  line-height: 1.55;
 }
 
 .download-list {
@@ -446,26 +572,47 @@ input:disabled {
 
 .download-list a {
   display: grid;
-  gap: 4px;
-  min-height: 78px;
-  padding: 14px 18px;
-  border-radius: 16px;
+  gap: 6px;
+  min-height: 92px;
+  padding: 16px 18px;
+  border-radius: 20px;
   border: 1px solid rgba(33, 112, 201, 0.14);
-  background: rgba(255, 255, 255, 0.85);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(243, 248, 255, 0.88)),
+    radial-gradient(circle at top right, rgba(33, 112, 201, 0.08), transparent 36%);
   color: var(--accent-strong);
   text-decoration: none;
   font-weight: 600;
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  animation: float-up 600ms ease both;
+}
+
+.download-list li:nth-child(2) a {
+  animation-delay: 90ms;
+}
+
+.download-list li:nth-child(3) a {
+  animation-delay: 180ms;
 }
 
 .download-list a:hover {
-  transform: translateY(-1px);
+  transform: translateY(-3px) scale(1.01);
   border-color: rgba(33, 112, 201, 0.26);
-  box-shadow: 0 12px 28px rgba(85, 111, 145, 0.12);
+  box-shadow: 0 18px 34px rgba(85, 111, 145, 0.14);
 }
 
 .download-list a span {
   font-size: 1rem;
+}
+
+.download-tag {
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(33, 112, 201, 0.08);
+  color: var(--accent-strong) !important;
+  font-size: 0.78rem !important;
+  font-weight: 700;
 }
 
 .download-list a small,

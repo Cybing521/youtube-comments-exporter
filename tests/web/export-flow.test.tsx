@@ -146,8 +146,12 @@ describe("export flow", () => {
       })
     );
 
-    expect(screen.getByText("2,626")).toBeInTheDocument();
-    expect(screen.getByText("适合继续做内容分析或接入脚本。")).toBeInTheDocument();
+    expect(screen.getByText("2,626 条评论已整理完成")).toBeInTheDocument();
+    expect(screen.getByText("工具链接")).toBeInTheDocument();
+    expect(screen.getByText("cybing.top")).toBeInTheDocument();
+    expect(screen.getByText("原始数据")).toBeInTheDocument();
+    expect(screen.getByText("阅读整理")).toBeInTheDocument();
+    expect(screen.getByText("分析表格")).toBeInTheDocument();
     expect(screen.getByText("下一步你可以")).toBeInTheDocument();
     expect(screen.getByText("做评论筛选和数据透视")).toBeInTheDocument();
     expect(screen.getByText("整理研究材料或运营复盘")).toBeInTheDocument();

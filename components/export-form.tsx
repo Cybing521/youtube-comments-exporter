@@ -33,9 +33,24 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
   const [turnstileToken, setTurnstileToken] = React.useState("");
   const [turnstileInstanceKey, setTurnstileInstanceKey] = React.useState(0);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [sampleApplied, setSampleApplied] = React.useState(false);
   const turnstileSiteKey =
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ??
     (process.env.NODE_ENV === "test" ? "1x00000000000000000000AA" : "");
+
+  React.useEffect(() => {
+    if (!sampleApplied) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      setSampleApplied(false);
+    }, 2200);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [sampleApplied]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -96,11 +111,17 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
           <button
             type="button"
             className="ghost-button"
-            onClick={() => setUrl(SAMPLE_VIDEO_URL)}
+            onClick={() => {
+              setUrl(SAMPLE_VIDEO_URL);
+              setSampleApplied(true);
+            }}
             disabled={isSubmitting}
           >
             填入示例链接
           </button>
+          <div className={`sample-feedback${sampleApplied ? " is-visible" : ""}`} aria-live="polite">
+            <span>示例链接已填入</span>
+          </div>
           <details className="api-help">
             <summary>还没有 API key？</summary>
             <ol>
@@ -111,7 +132,7 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
           </details>
         </div>
       </section>
-      <div className="field">
+      <div className={`field${sampleApplied ? " sample-applied" : ""}`}>
         <label htmlFor="youtube-url">YouTube 链接</label>
         <input
           id="youtube-url"

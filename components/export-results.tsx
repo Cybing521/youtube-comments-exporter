@@ -28,6 +28,27 @@ const LOADING_STAGES = [
   },
 ];
 
+const DOWNLOAD_CARDS = [
+  {
+    tag: "原始数据",
+    title: "下载 JSON",
+    description: "保留完整结构，适合继续接脚本或做内容分析。",
+    urlKey: "jsonUrl" as const,
+  },
+  {
+    tag: "阅读整理",
+    title: "下载分层 Excel",
+    description: "更适合人工核对一级评论和高赞回复关系。",
+    urlKey: "threadedExcelUrl" as const,
+  },
+  {
+    tag: "分析表格",
+    title: "下载扁平 Excel",
+    description: "直接拿去筛选、透视或批量整理更顺手。",
+    urlKey: "flatExcelUrl" as const,
+  },
+];
+
 export function ExportResults({ status, error, result }: ExportResultsProps) {
   const [loadingStageIndex, setLoadingStageIndex] = React.useState(0);
 
@@ -86,15 +107,27 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
   }
 
   if (status === "success" && result) {
+    const totalCount = result.summary.totalCommentCount.toLocaleString("zh-CN");
+
     return (
       <section className="panel results-panel success-panel">
         <div className="result-hero">
           <div className="result-copy">
             <p className="section-kicker">导出成功</p>
-            <h2>本次导出已准备完成</h2>
-            <p>视频 ID：{result.videoId}。三种文件都已经准备好，适合直接截图分享或继续分析。</p>
+            <h2>{totalCount} 条评论已整理完成</h2>
+            <p className="result-subtitle">本次导出已准备完成</p>
+            <p>视频 ID：{result.videoId}。三种文件都已经准备好，适合直接截图分享、继续分析，或者发给同事协作。</p>
+            <div className="result-link-callout">
+              <span>工具链接</span>
+              <a href="https://www.cybing.top" target="_blank" rel="noreferrer">
+                cybing.top
+              </a>
+            </div>
           </div>
-          <div className="result-ready">3 份文件已就绪</div>
+          <div className="result-ready">
+            <span>3 份文件已就绪</span>
+            <small>JSON / 分层 Excel / 扁平 Excel</small>
+          </div>
         </div>
         <div className="stats-grid">
           <article className="stat-card">
@@ -111,24 +144,15 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
           </article>
         </div>
         <ul className="download-list">
-          <li>
-            <a href={result.files.jsonUrl} target="_blank" rel="noreferrer">
-              <span>下载 JSON</span>
-              <small>适合继续做内容分析或接入脚本。</small>
-            </a>
-          </li>
-          <li>
-            <a href={result.files.threadedExcelUrl} target="_blank" rel="noreferrer">
-              <span>下载分层 Excel</span>
-              <small>适合人工核对评论结构和高赞回复。</small>
-            </a>
-          </li>
-          <li>
-            <a href={result.files.flatExcelUrl} target="_blank" rel="noreferrer">
-              <span>下载扁平 Excel</span>
-              <small>适合直接做筛选、透视表和批量整理。</small>
-            </a>
-          </li>
+          {DOWNLOAD_CARDS.map((card) => (
+            <li key={card.title}>
+              <a href={result.files[card.urlKey]} target="_blank" rel="noreferrer">
+                <small className="download-tag">{card.tag}</small>
+                <span>{card.title}</span>
+                <small>{card.description}</small>
+              </a>
+            </li>
+          ))}
         </ul>
         <div className="next-actions">
           <span>下一步你可以</span>

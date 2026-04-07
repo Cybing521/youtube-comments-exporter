@@ -34,5 +34,6 @@ describe("homepage", () => {
     fireEvent.click(screen.getByRole("button", { name: "填入示例链接" }));
 
     expect(screen.getByLabelText("YouTube 链接")).toHaveValue("https://www.youtube.com/watch?v=gtEROmL0NzQ");
+    expect(screen.getByText("示例链接已填入")).toBeInTheDocument();
   });
 });
