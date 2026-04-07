@@ -3,7 +3,7 @@
 import "@testing-library/jest-dom/vitest";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import HomePage from "../../apps/web/app/page";
+import HomePage from "../../app/page";
 
 describe("homepage", () => {
   it("renders the Chinese export shell", () => {

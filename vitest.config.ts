@@ -9,7 +9,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "apps/web")
+      "@": path.resolve(__dirname)
     }
   }
 });

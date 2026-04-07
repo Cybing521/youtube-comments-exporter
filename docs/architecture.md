@@ -4,8 +4,9 @@
 
 The project is split into two main layers:
 
-- `apps/web`: the user-facing Next.js application and API routes
-- `packages/export-core`: reusable TypeScript logic for YouTube comment export and file generation
+- `app`: the user-facing Next.js application and API routes
+- `components`: page-level and form components
+- `lib/export-core`: reusable TypeScript logic for YouTube comment export and file generation
 
 ## Request Flow
 

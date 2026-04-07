@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exportVideoComments } from "../../apps/web/lib/export-core/export-comments";
+import { exportVideoComments } from "../../lib/export-core/export-comments";
 
 class FakeYouTubeClient {
   public commentsCalls: Array<{ parentId: string; pageToken?: string }> = [];

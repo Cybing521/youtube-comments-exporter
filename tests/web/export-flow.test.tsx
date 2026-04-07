@@ -4,7 +4,7 @@ import "@testing-library/jest-dom/vitest";
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import HomePage from "../../apps/web/app/page";
+import HomePage from "../../app/page";
 
 describe("export flow", () => {
   beforeEach(() => {

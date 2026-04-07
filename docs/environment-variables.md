@@ -14,7 +14,7 @@ Vercel Blob read-write token for uploading generated JSON and Excel files.
 ## Local Setup
 
 ```bash
-cp apps/web/.env.example apps/web/.env.local
+cp .env.example .env.local
 ```
 
 Then fill in the values manually or run:

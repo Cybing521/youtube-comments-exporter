@@ -12,11 +12,26 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["apps/web/*"]
+      "@/*": ["./*"]
     },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "types": ["vitest/globals"]
   },
-  "include": ["apps/**/*", "tests/**/*", "vitest.config.ts"]
+  "include": [
+    "app/**/*",
+    "components/**/*",
+    "lib/**/*",
+    "tests/**/*",
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "vitest.config.ts"
+  ],
+  "exclude": ["node_modules"]
 }

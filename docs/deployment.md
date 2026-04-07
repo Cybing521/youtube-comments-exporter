@@ -17,7 +17,7 @@ Set these variables in Vercel Project Settings -> Environment Variables:
 For local development:
 
 ```bash
-cp apps/web/.env.example apps/web/.env.local
+cp .env.example .env.local
 ```
 
 ## First Deployment
@@ -25,7 +25,7 @@ cp apps/web/.env.example apps/web/.env.local
 1. Push the repository to GitHub
 2. In Vercel, choose `Add New Project`
 3. Import the GitHub repository
-4. Set the `Root Directory` to `apps/web`. This repository is a monorepo, but the actual Next.js application root is `apps/web`.
+4. Leave `Root Directory` empty. The repository root is the actual Next.js application root.
 5. Set environment variables:
    - `YOUTUBE_API_KEY`
    - `BLOB_READ_WRITE_TOKEN`

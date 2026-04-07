@@ -13,7 +13,7 @@ afterEach(() => {
 describe("POST /api/export", () => {
   it("returns export summary and blob urls with server-side api key", async () => {
     process.env.YOUTUBE_API_KEY = "AIza-server";
-    const { handleExportRequest } = await import("../../apps/web/lib/handle-export-request");
+    const { handleExportRequest } = await import("../../lib/handle-export-request");
 
     const data = await handleExportRequest(
       {
@@ -50,13 +50,13 @@ describe("POST /api/export", () => {
 
   it("rejects missing url", async () => {
     process.env.YOUTUBE_API_KEY = "AIza-server";
-    const { handleExportRequest } = await import("../../apps/web/lib/handle-export-request");
+    const { handleExportRequest } = await import("../../lib/handle-export-request");
     await expect(handleExportRequest({})).rejects.toThrow("缺少 YouTube 链接");
   });
 
   it("rejects missing server api key", async () => {
     delete process.env.YOUTUBE_API_KEY;
-    const { handleExportRequest } = await import("../../apps/web/lib/handle-export-request");
+    const { handleExportRequest } = await import("../../lib/handle-export-request");
     await expect(
       handleExportRequest({
         url: "https://www.youtube.com/watch?v=gtEROmL0NzQ",

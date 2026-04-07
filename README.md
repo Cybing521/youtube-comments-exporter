@@ -6,7 +6,7 @@
 - `threaded Excel`
 - `flat Excel`
 
-这个仓库已经整理成适合部署在 Vercel 的 Next.js Web 应用，适合继续在线迭代和公开开源。
+这个仓库已经整理成适合直接部署在 Vercel 的根目录 Next.js Web 应用，适合继续在线迭代和公开开源。
 
 ## Features
 
@@ -19,22 +19,23 @@
 ## Project Structure
 
 ```text
-apps/web                 Next.js 前端和 API 路由
-packages/export-core     YouTube 评论抓取与导出核心
-docs/plans               设计和实施计划
+app                      Next.js App Router 页面和 API 路由
+components               前端组件
+lib                      YouTube 评论抓取、导出和 Blob 上传核心
+docs                     架构、部署和计划文档
 tests                    Web 侧测试与历史 Python 测试
-src                       原始 Python 原型实现
+src                      原始 Python 原型实现
 ```
 
 ## Environment Variables
 
-本地开发时，请在 `apps/web` 下创建环境变量文件：
+本地开发时，请在仓库根目录创建环境变量文件：
 
 ```bash
-cp apps/web/.env.example apps/web/.env.local
+cp .env.example .env.local
 ```
 
-然后在 `apps/web/.env.local` 里填写：
+然后在 `.env.local` 里填写：
 
 ```bash
 YOUTUBE_API_KEY=your_youtube_data_api_key
@@ -45,7 +46,7 @@ BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
 
 ```bash
 pnpm install
-pnpm --dir apps/web dev
+pnpm dev
 ```
 
 打开 [http://localhost:3000](http://localhost:3000)。
@@ -69,7 +70,7 @@ pnpm build
 
 1. 把仓库推到 GitHub。
 2. 在 Vercel 中 `Add New Project` 并导入仓库。
-3. 把 `Root Directory` 设为 `apps/web`。这个项目在仓库里是 monorepo 结构，但真正的 Next.js 应用根目录是 `apps/web`。
+3. 保持 `Root Directory` 为空，直接使用仓库根目录作为 Next.js 应用根目录。
 4. 配置环境变量：
    - `YOUTUBE_API_KEY`
    - `BLOB_READ_WRITE_TOKEN`
@@ -99,6 +100,6 @@ pnpm build
 
 当前还没有完成的上线前事项：
 
-- 在 Vercel 项目里把 `Root Directory` 正式设为 `apps/web`
+- 在 Vercel 项目里确认 `Root Directory` 为空
 - 一次成功的 Vercel 生产部署
 - 用真实 YouTube 视频做一次线上导出验证
