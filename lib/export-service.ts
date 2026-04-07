@@ -34,6 +34,10 @@ export interface ExportJobResult {
     threadedExcelUrl: string;
     flatExcelUrl: string;
   };
+  cache?: {
+    hit: boolean;
+    cachedAt?: string;
+  };
 }
 
 interface ExportServiceDependencies {
@@ -97,6 +101,10 @@ export async function runExportAndUpload(
       order: cached.order,
       summary: cached.summary,
       files: cached.files,
+      cache: {
+        hit: true,
+        cachedAt: cached.cachedAt,
+      },
     };
   }
 
@@ -187,7 +195,10 @@ export async function runExportAndUpload(
       jsonUrl: json.url,
       threadedExcelUrl: threadedExcel.url,
       flatExcelUrl: flatExcel.url
-    }
+    },
+    cache: {
+      hit: false,
+    },
   };
 
   try {

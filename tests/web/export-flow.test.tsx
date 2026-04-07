@@ -201,6 +201,10 @@ describe("export flow", () => {
                 threadedExcelUrl: "https://blob.example/threaded",
                 flatExcelUrl: "https://blob.example/flat",
               },
+              cache: {
+                hit: true,
+                cachedAt: "2026-04-07T10:00:00.000Z",
+              },
             },
           })}\n`;
 
@@ -229,7 +233,7 @@ describe("export flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "开始导出" }));
 
     await waitFor(() => {
-      expect(screen.getByText("本次导出已准备完成")).toBeInTheDocument();
+      expect(screen.getByText("本次直接复用了上一次导出结果")).toBeInTheDocument();
     });
 
     expect(fetch).toHaveBeenCalledWith(
@@ -246,6 +250,8 @@ describe("export flow", () => {
     );
 
     expect(screen.getByText("2,626 条评论已整理完成")).toBeInTheDocument();
+    expect(screen.getByText("本次直接复用了上一次导出结果")).toBeInTheDocument();
+    expect(screen.getByText(/已命中缓存/)).toBeInTheDocument();
     expect(screen.getAllByText("工具链接").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("cybing.top")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "复制反馈邮箱" })).toBeInTheDocument();

@@ -51,6 +51,36 @@ async function readYouTubeApiError(response: Response) {
   }
 }
 
+function classifyApiKeyValidationMessage(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("api key not valid")) {
+    return "这把 YouTube API key 看起来无效，请检查是否粘贴完整。";
+  }
+
+  if (
+    normalized.includes("accessnotconfigured") ||
+    normalized.includes("youtube data api v3 has not been used") ||
+    normalized.includes("is disabled")
+  ) {
+    return "这个 Google Cloud 项目还没有启用 YouTube Data API v3。";
+  }
+
+  if (normalized.includes("quotaexceeded") || normalized.includes("exceeded your quota")) {
+    return "这把 YouTube API key 今日配额已经用完了，请明天再试或换一个项目的 key。";
+  }
+
+  if (normalized.includes("requests from referer")) {
+    return "这把 YouTube API key 做了来源限制，当前站点不在允许列表里。";
+  }
+
+  if (normalized.includes("permission_denied") || normalized.includes("forbidden")) {
+    return "这把 YouTube API key 没有当前请求需要的权限，请检查项目配置。";
+  }
+
+  return "这把 YouTube API key 现在不能正常访问 YouTube Data API。";
+}
+
 async function requestJson(endpoint: string, params: Record<string, string>) {
   let attempt = 0;
   let lastError: Error | undefined;
@@ -109,7 +139,7 @@ export function createYouTubeDataClient(apiKey: string): YouTubeClient {
         await requestJson("https://www.googleapis.com/youtube/v3/videos", params);
       } catch (error) {
         const message = error instanceof Error ? error.message : "YouTube API 请求失败";
-        throw new Error(`YouTube API Key 不可用：${message}`);
+        throw new Error(`YouTube API Key 不可用：${classifyApiKeyValidationMessage(message)}`);
       }
     },
 

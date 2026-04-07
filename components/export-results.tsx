@@ -269,6 +269,7 @@ export function ExportResults({ status, error, result, progress }: ExportResults
   if (status === "success" && result) {
     const exportResult = result;
     const totalCount = exportResult.summary.totalCommentCount.toLocaleString("zh-CN");
+    const isCacheHit = exportResult.cache?.hit === true;
 
     function handleGeneratePoster() {
       setIsPosterVisible(true);
@@ -292,10 +293,20 @@ export function ExportResults({ status, error, result, progress }: ExportResults
       <section className="panel results-panel success-panel">
         <div className="result-hero">
           <div className="result-copy">
-            <p className="section-kicker">导出成功</p>
+            <p className="section-kicker">{isCacheHit ? "命中缓存" : "导出成功"}</p>
             <h2>{totalCount} 条评论已整理完成</h2>
-            <p className="result-subtitle">本次导出已准备完成</p>
+            <p className="result-subtitle">{isCacheHit ? "本次直接复用了上一次导出结果" : "本次导出已准备完成"}</p>
             <p>视频 ID：{exportResult.videoId}。三种文件都已经准备好，适合直接截图分享、继续分析，或者发给同事协作。</p>
+            {isCacheHit ? (
+              <div className="cache-hit-note">
+                <strong>已命中缓存</strong>
+                <span>
+                  {exportResult.cache?.cachedAt
+                    ? `这次直接复用了 ${new Date(exportResult.cache.cachedAt).toLocaleString("zh-CN")} 生成的结果。`
+                    : "这个视频最近已经导出过，所以这次直接返回了现成下载链接。"}
+                </span>
+              </div>
+            ) : null}
             <div className="result-link-callout">
               <span>工具链接</span>
               <a href="https://www.cybing.top" target="_blank" rel="noreferrer">

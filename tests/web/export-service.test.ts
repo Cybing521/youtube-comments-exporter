@@ -64,6 +64,7 @@ describe("runExportAndUpload", () => {
     expect(result.videoId).toBe("gtEROmL0NzQ");
     expect(result.summary.totalCommentCount).toBe(1);
     expect(client.validatedVideoIds).toEqual(["gtEROmL0NzQ"]);
+    expect(result.cache).toEqual({ hit: false });
     expect(uploaded).toEqual([
       "gtEROmL0NzQ.time.comments.json",
       "gtEROmL0NzQ.time.comments.xlsx",
@@ -109,5 +110,9 @@ describe("runExportAndUpload", () => {
     expect(client.validatedVideoIds).toEqual(["gtEROmL0NzQ"]);
     expect(result.files.jsonUrl).toBe("https://blob.example.com/cached.json");
     expect(result.summary.totalCommentCount).toBe(2626);
+    expect(result.cache).toEqual({
+      hit: true,
+      cachedAt: "2026-04-07T00:00:00.000Z",
+    });
   });
 });

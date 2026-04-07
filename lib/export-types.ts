@@ -28,6 +28,10 @@ export interface ExportResponse {
   order: "relevance" | "time";
   summary: ExportSummary;
   files: ExportFiles;
+  cache?: {
+    hit: boolean;
+    cachedAt?: string;
+  };
 }
 
 export interface ExportRequestInput {

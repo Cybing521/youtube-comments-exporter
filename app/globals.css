@@ -603,6 +603,28 @@ input:disabled {
   font-weight: 700;
 }
 
+.cache-hit-note {
+  display: grid;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(33, 112, 201, 0.08);
+  border: 1px solid rgba(33, 112, 201, 0.14);
+}
+
+.cache-hit-note strong {
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+}
+
+.cache-hit-note span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .result-link-callout {
   display: inline-flex;
   flex-wrap: wrap;
