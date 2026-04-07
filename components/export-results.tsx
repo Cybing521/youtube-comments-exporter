@@ -143,6 +143,30 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
             <strong>{result.summary.totalCommentCount.toLocaleString("zh-CN")}</strong>
           </article>
         </div>
+        <section className="share-card" aria-label="分享卡片">
+          <div className="share-card-copy">
+            <p className="section-kicker">截图分享区</p>
+            <h3>{totalCount} 条评论</h3>
+            <p>这次导出的结构化结果已经准备好，适合直接截图发给同事、朋友或发到小红书展示。</p>
+          </div>
+          <div className="share-card-metrics">
+            <span>{result.summary.topLevelCommentCount.toLocaleString("zh-CN")} 一级评论</span>
+            <span>{result.summary.replyCount.toLocaleString("zh-CN")} 回复</span>
+            <span>3 份文件</span>
+          </div>
+          <div className="share-card-footer">
+            <div className="share-card-link">
+              <small>工具链接</small>
+              <a href="https://www.cybing.top" target="_blank" rel="noreferrer">
+                www.cybing.top
+              </a>
+            </div>
+            <div className="share-card-link">
+              <small>邮箱反馈</small>
+              <a href="mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈">cyibin06@gmail.com</a>
+            </div>
+          </div>
+        </section>
         <ul className="download-list">
           {DOWNLOAD_CARDS.map((card) => (
             <li key={card.title}>
@@ -162,6 +186,10 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
             <small>分享这次导出结果截图</small>
           </div>
         </div>
+        <p className="results-feedback">
+          想提需求或反馈问题？
+          <a href="mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈">发邮件到 cyibin06@gmail.com</a>
+        </p>
       </section>
     );
   }

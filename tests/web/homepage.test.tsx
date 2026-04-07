@@ -15,10 +15,18 @@ describe("homepage", () => {
     render(<HomePage />);
 
     expect(screen.getByText("YouTube 评论导出")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "邮箱反馈" })).toHaveAttribute(
+      "href",
+      "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
+    );
     expect(screen.getByText("第一次使用也能很快上手")).toBeInTheDocument();
     expect(screen.getByText("准备一个公开视频链接")).toBeInTheDocument();
     expect(screen.getByText("填入你自己的 YouTube API key")).toBeInTheDocument();
     expect(screen.getByText("完成人机验证并开始导出")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "给我发需求或反馈" })).toHaveAttribute(
+      "href",
+      "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
+    );
     expect(screen.getByLabelText("YouTube 链接")).toBeInTheDocument();
     expect(screen.getByLabelText("YouTube API Key")).toBeInTheDocument();
     expect(screen.getByText(/你的 API key 只用于本次导出请求/)).toBeInTheDocument();

@@ -63,6 +63,84 @@ input:disabled {
   padding: 28px;
 }
 
+.hero {
+  display: grid;
+  gap: 20px;
+  overflow: hidden;
+}
+
+.hero-topline,
+.hero-content {
+  display: grid;
+  gap: 18px;
+}
+
+.hero-topline {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.hero-content {
+  grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.85fr);
+  align-items: end;
+}
+
+.hero-main {
+  display: grid;
+  gap: 12px;
+}
+
+.hero-feedback-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(33, 112, 201, 0.16);
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.hero-feedback-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(33, 112, 201, 0.26);
+  box-shadow: 0 12px 24px rgba(85, 111, 145, 0.1);
+}
+
+.hero-sidecard {
+  display: grid;
+  gap: 12px;
+  align-self: stretch;
+  padding: 18px;
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(239, 248, 255, 0.82)),
+    radial-gradient(circle at top right, rgba(33, 112, 201, 0.12), transparent 38%);
+  border: 1px solid rgba(201, 214, 230, 0.76);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+  animation: float-up 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 120ms;
+}
+
+.hero-sidecard strong {
+  font-size: 1rem;
+}
+
+.hero-sidecard p {
+  color: var(--muted);
+}
+
+.hero-sidecard a {
+  width: fit-content;
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-weight: 700;
+}
+
 .hero h1 {
   margin: 12px 0 10px;
   font-family: "Songti SC", "STSong", serif;
@@ -74,7 +152,7 @@ input:disabled {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 4px;
 }
 
 .hero-badges span,
@@ -98,7 +176,7 @@ input:disabled {
 
 .lead {
   margin: 0;
-  max-width: 720px;
+  max-width: 680px;
   color: #4f6075;
   line-height: 1.65;
 }
@@ -562,6 +640,82 @@ input:disabled {
   line-height: 1.55;
 }
 
+.share-card {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+  padding: 22px;
+  border-radius: 28px;
+  border: 1px solid rgba(33, 112, 201, 0.12);
+  background:
+    radial-gradient(circle at top right, rgba(33, 112, 201, 0.12), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(31, 139, 107, 0.12), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(241, 247, 255, 0.9));
+  box-shadow: 0 22px 44px rgba(85, 111, 145, 0.08);
+  animation: float-up 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.share-card-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.share-card-copy h3 {
+  margin: 0;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.share-card-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.share-card-metrics span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(201, 214, 230, 0.82);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.share-card-footer {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.share-card-link {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(201, 214, 230, 0.78);
+}
+
+.share-card-link small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.share-card-link a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-weight: 800;
+  word-break: break-all;
+}
+
 .download-list {
   margin: 16px 0 0;
   padding-left: 0;
@@ -657,6 +811,21 @@ input:disabled {
   font-weight: 600;
 }
 
+.results-feedback {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px !important;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.results-feedback a {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .pulse-row {
   display: flex;
   gap: 10px;
@@ -717,6 +886,8 @@ input:disabled {
     padding: 22px;
   }
 
+  .hero-topline,
+  .hero-content,
   .quickstart-grid,
   .progress-rail,
   .stats-grid {
@@ -724,8 +895,13 @@ input:disabled {
   }
 
   .quickstart-actions,
-  .result-hero {
+  .result-hero,
+  .share-card-footer {
     grid-template-columns: 1fr;
+  }
+
+  .hero-feedback-link {
+    justify-content: center;
   }
 
   .action-row {

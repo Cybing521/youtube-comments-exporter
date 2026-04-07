@@ -147,8 +147,14 @@ describe("export flow", () => {
     );
 
     expect(screen.getByText("2,626 条评论已整理完成")).toBeInTheDocument();
-    expect(screen.getByText("工具链接")).toBeInTheDocument();
+    expect(screen.getAllByText("工具链接")).toHaveLength(2);
     expect(screen.getByText("cybing.top")).toBeInTheDocument();
+    expect(screen.getByText("截图分享区")).toBeInTheDocument();
+    expect(screen.getAllByText("邮箱反馈").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole("link", { name: "cyibin06@gmail.com" })).toHaveAttribute(
+      "href",
+      "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
+    );
     expect(screen.getByText("原始数据")).toBeInTheDocument();
     expect(screen.getByText("阅读整理")).toBeInTheDocument();
     expect(screen.getByText("分析表格")).toBeInTheDocument();
