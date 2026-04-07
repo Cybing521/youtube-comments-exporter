@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { read, utils } from "xlsx";
-import { buildExportArtifacts } from "../../packages/export-core/src/artifacts";
+import { buildExportArtifacts } from "../../apps/web/lib/export-core/artifacts";
 
 const sampleExport = {
   videoId: "video-1",

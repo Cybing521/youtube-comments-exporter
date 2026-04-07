@@ -2,10 +2,10 @@ import {
   buildFlatExcelArtifact,
   buildJsonArtifact,
   buildThreadedExcelArtifact
-} from "../../../packages/export-core/src/artifacts";
-import { exportVideoComments } from "../../../packages/export-core/src/export-comments";
-import { createYouTubeDataClient, extractVideoId } from "../../../packages/export-core/src/youtube";
-import type { YouTubeClient } from "../../../packages/export-core/src/types";
+} from "./export-core/artifacts";
+import { exportVideoComments } from "./export-core/export-comments";
+import { createYouTubeDataClient, extractVideoId } from "./export-core/youtube";
+import type { YouTubeClient } from "./export-core/types";
 import { uploadArtifact, type UploadedArtifact } from "./blob";
 
 export interface ExportJobInput {

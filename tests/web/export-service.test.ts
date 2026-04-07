@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { runExportAndUpload } from "../../apps/web/lib/export-service";
-import type { SortOrder, YouTubeClient } from "../../packages/export-core/src/types";
+import type { SortOrder, YouTubeClient } from "../../apps/web/lib/export-core/types";
 
 class FakeYouTubeClient implements YouTubeClient {
   async listCommentThreads(_videoId: string, _pageToken?: string, _order?: SortOrder) {

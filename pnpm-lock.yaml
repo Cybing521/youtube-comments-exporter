@@ -60,13 +60,28 @@ importers:
       react-dom:
         specifier: ^19.1.0
         version: 19.2.4(react@19.2.4)
+      xlsx:
+        specifier: ^0.18.5
+        version: 0.18.5
     devDependencies:
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.12.2
+      '@types/react':
+        specifier: ^19.2.2
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19.2.2
+        version: 19.2.3(@types/react@19.2.14)
       eslint:
         specifier: ^9.39.1
         version: 9.39.4
       eslint-config-next:
         specifier: ^15.5.14
         version: 15.5.14(eslint@9.39.4)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
 
   packages/export-core: {}
 
