@@ -10,6 +10,8 @@
 - 用户自填 YouTube API key
 - 使用 Turnstile 做基础人机验证
 - 强化首次使用引导、导出过程反馈和导出成功展示
+- 持续压缩首页解释性内容，让首屏更像可直接使用的产品入口
+- 用服务端真实阶段替换前端估算进度，减少“看起来卡住”的误解
 
 ## Work Nodes
 
@@ -29,7 +31,8 @@
 
 - 将“导出中”拆成多个可理解阶段
 - 用更明显的视觉状态降低等待焦虑
-- 保持实现简单，不做伪精确进度
+- 从前端估时切换成服务端真实阶段回传
+- 在等待态明确展示当前真实步骤和已等待时间
 
 ### Phase 4: Shareable Result Page
 
@@ -50,13 +53,21 @@
 - `pnpm dlx vercel build --prod --yes`
 - 线上验证 `www.cybing.top`
 
+### Phase 7: Homepage Compression
+
+- 继续压缩首屏说明，减少重复价值描述
+- 将引导卡收敛成更短的单行步骤
+- 保留一个主入口和一个折叠帮助，而不是并列解释区
+
 ## Completed Already
 
 - Vercel Web 站点已上线
 - 自定义域名已切换
 - 用户自填 API key 流程已接入
 - Cloudflare Turnstile 已接入
+- API key 已支持浏览器本地保存
+- 分享海报生成与下载已接入
 
 ## Immediate Next Step
 
-先继续把“导出完成后的传播动作”做完整，再考虑更深的分享链路。
+先继续压缩首页，并把导出流程改成服务端真实进度流。

@@ -10,6 +10,19 @@ export interface ExportFiles {
   flatExcelUrl: string;
 }
 
+export type ExportProgressStage =
+  | "validating"
+  | "fetching-comments"
+  | "hydrating-replies"
+  | "building-files"
+  | "uploading-files";
+
+export interface ExportProgressEvent {
+  stage: ExportProgressStage;
+  title: string;
+  detail: string;
+}
+
 export interface ExportResponse {
   videoId: string;
   order: "relevance" | "time";
@@ -23,3 +36,17 @@ export interface ExportRequestInput {
   turnstileToken: string;
   order?: "relevance" | "time";
 }
+
+export type ExportStreamEvent =
+  | {
+      type: "progress";
+      progress: ExportProgressEvent;
+    }
+  | {
+      type: "success";
+      result: ExportResponse;
+    }
+  | {
+      type: "error";
+      error: string;
+    };

@@ -30,11 +30,10 @@ describe("homepage", () => {
     expect(screen.getByText("YouTube 评论导出")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "邮箱反馈" })).toBeInTheDocument();
     expect(screen.queryByText("在线导出工具")).not.toBeInTheDocument();
-    expect(screen.queryByText("第一次使用也能很快上手")).not.toBeInTheDocument();
-    expect(screen.getByText("准备一个公开视频链接")).toBeInTheDocument();
-    expect(screen.getByText("填入你自己的 YouTube API key")).toBeInTheDocument();
-    expect(screen.getByText("完成人机验证并开始导出")).toBeInTheDocument();
     expect(screen.queryByText("给我发需求或反馈")).not.toBeInTheDocument();
+    expect(screen.getByText("贴链接")).toBeInTheDocument();
+    expect(screen.getByText("填 API key")).toBeInTheDocument();
+    expect(screen.getAllByText("开始导出").length).toBeGreaterThan(0);
     expect(screen.getByLabelText("YouTube 链接")).toBeInTheDocument();
     expect(screen.getByLabelText("YouTube API Key")).toBeInTheDocument();
     expect(screen.getByText(/你的 API key 只用于本次导出请求/)).toBeInTheDocument();

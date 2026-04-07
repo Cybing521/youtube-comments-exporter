@@ -2,35 +2,21 @@
 
 import React from "react";
 import { CopyEmailButton } from "./copy-email-button";
-import type { ExportResponse } from "../lib/export-types";
+import type { ExportProgressEvent, ExportProgressStage, ExportResponse } from "../lib/export-types";
 
 interface ExportResultsProps {
   status: "idle" | "loading" | "success" | "error";
   error?: string;
   result?: ExportResponse | null;
+  progress?: ExportProgressEvent | null;
 }
 
-const LOADING_STAGES = [
-  {
-    title: "正在校验输入信息",
-    detail: "确认链接、API key 和安全验证已经准备好。",
-    minSeconds: 0,
-  },
-  {
-    title: "正在请求评论数据",
-    detail: "开始获取一级评论并补全回复内容。",
-    minSeconds: 4,
-  },
-  {
-    title: "正在生成导出文件",
-    detail: "整理 JSON、分层 Excel 和扁平 Excel。",
-    minSeconds: 10,
-  },
-  {
-    title: "正在准备下载结果",
-    detail: "上传文件并整理最终下载入口。",
-    minSeconds: 18,
-  },
+const LOADING_STAGES: Array<{ stage: ExportProgressStage; label: string }> = [
+  { stage: "validating", label: "正在校验输入信息" },
+  { stage: "fetching-comments", label: "正在请求评论数据" },
+  { stage: "hydrating-replies", label: "正在补全回复内容" },
+  { stage: "building-files", label: "正在生成导出文件" },
+  { stage: "uploading-files", label: "正在准备下载结果" },
 ];
 
 const DOWNLOAD_CARDS = [
@@ -194,7 +180,7 @@ function createPosterDownloadUrl(result: ExportResponse) {
   }
 }
 
-export function ExportResults({ status, error, result }: ExportResultsProps) {
+export function ExportResults({ status, error, result, progress }: ExportResultsProps) {
   const [loadingSeconds, setLoadingSeconds] = React.useState(0);
   const [isPosterVisible, setIsPosterVisible] = React.useState(false);
   const [posterDownloadUrl, setPosterDownloadUrl] = React.useState<string | null>(null);
@@ -226,14 +212,15 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
   }, [status, result]);
 
   if (status === "loading") {
-    const activeStageIndex = LOADING_STAGES.reduce((current, stage, index) => {
-      if (loadingSeconds >= stage.minSeconds) {
-        return index;
-      }
-
-      return current;
-    }, 0);
-    const activeStage = LOADING_STAGES[activeStageIndex];
+    const activeStageIndex = Math.max(
+      0,
+      LOADING_STAGES.findIndex((item) => item.stage === progress?.stage),
+    );
+    const activeStage = progress ?? {
+      stage: "validating" as const,
+      title: "正在校验输入信息",
+      detail: "正在确认链接、API key 和安全验证信息。",
+    };
 
     return (
       <section className="panel results-panel">
@@ -245,17 +232,17 @@ export function ExportResults({ status, error, result }: ExportResultsProps) {
             <p>{activeStage.detail}</p>
             <div className="progress-meta">
               <strong>已等待 {loadingSeconds} 秒</strong>
-              {loadingSeconds >= 10 ? (
-                <span>评论较多的视频通常需要 15 到 30 秒，这不是卡住了。页面会在完成后自动显示下载按钮。</span>
+              {loadingSeconds >= 12 ? (
+                <span>如果当前视频评论很多，补全回复和上传文件会明显更久。这不是前端卡住了，页面显示的是服务端真实阶段。</span>
               ) : (
-                <span>我们会在服务端继续抓取评论、补全回复并生成文件，完成后自动展示下载结果。</span>
+                <span>服务端会按实际执行顺序回传阶段，完成后这里会直接出现下载按钮。</span>
               )}
             </div>
           </div>
           <ol className="progress-rail">
             {LOADING_STAGES.map((stage, index) => (
-              <li key={stage.title} className={index <= activeStageIndex ? "active" : undefined}>
-                <span>{stage.title}</span>
+              <li key={stage.stage} className={index <= activeStageIndex ? "active" : undefined}>
+                <span>{stage.label}</span>
               </li>
             ))}
           </ol>

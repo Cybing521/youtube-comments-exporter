@@ -33,16 +33,23 @@ describe("export flow", () => {
 
   it("shows staged progress while an export is running", async () => {
     vi.useFakeTimers();
-
-    let resolveResponse: ((response: Response) => void) | undefined;
+    const encoder = new TextEncoder();
+    let streamController: ReadableStreamDefaultController<Uint8Array> | undefined;
 
     vi.stubGlobal(
       "fetch",
-      vi.fn(
-        () =>
-          new Promise<Response>((resolve) => {
-            resolveResponse = resolve;
+      vi.fn(async () =>
+        new Response(
+          new ReadableStream({
+            start(controller) {
+              streamController = controller;
+            },
           }),
+          {
+            status: 200,
+            headers: { "content-type": "text/plain; charset=utf-8" },
+          },
+        ),
       ),
     );
 
@@ -64,44 +71,100 @@ describe("export flow", () => {
     expect(screen.getByText("已等待 1 秒")).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(3900);
+      streamController?.enqueue(
+        encoder.encode(
+          `${JSON.stringify({
+            type: "progress",
+            progress: {
+              stage: "fetching-comments",
+              title: "正在请求评论数据",
+              detail: "已获取第 1 页评论线程，继续向后补齐。",
+            },
+          })}\n`,
+        ),
+      );
+      await Promise.resolve();
     });
     expect(screen.getByRole("heading", { name: "正在请求评论数据" })).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(6000);
+      streamController?.enqueue(
+        encoder.encode(
+          `${JSON.stringify({
+            type: "progress",
+            progress: {
+              stage: "hydrating-replies",
+              title: "正在补全回复内容",
+              detail: "正在补全当前批次回复：48/100。",
+            },
+          })}\n`,
+        ),
+      );
+      vi.advanceTimersByTime(11000);
+      await Promise.resolve();
     });
-    expect(screen.getByRole("heading", { name: "正在生成导出文件" })).toBeInTheDocument();
-    expect(screen.getByText("评论较多的视频通常需要 15 到 30 秒，这不是卡住了。页面会在完成后自动显示下载按钮。")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "正在补全回复内容" })).toBeInTheDocument();
+    expect(
+      screen.getByText("如果当前视频评论很多，补全回复和上传文件会明显更久。这不是前端卡住了，页面显示的是服务端真实阶段。"),
+    ).toBeInTheDocument();
 
     await act(async () => {
-      vi.advanceTimersByTime(8000);
+      streamController?.enqueue(
+        encoder.encode(
+          `${JSON.stringify({
+            type: "progress",
+            progress: {
+              stage: "building-files",
+              title: "正在生成导出文件",
+              detail: "开始整理 JSON、分层 Excel 和扁平 Excel。",
+            },
+          })}\n`,
+        ),
+      );
+      await Promise.resolve();
+    });
+    expect(screen.getByRole("heading", { name: "正在生成导出文件" })).toBeInTheDocument();
+
+    await act(async () => {
+      streamController?.enqueue(
+        encoder.encode(
+          `${JSON.stringify({
+            type: "progress",
+            progress: {
+              stage: "uploading-files",
+              title: "正在准备下载结果",
+              detail: "三个文件都已上传完成，正在整理最终下载入口。",
+            },
+          })}\n`,
+        ),
+      );
+      await Promise.resolve();
     });
     expect(screen.getByRole("heading", { name: "正在准备下载结果" })).toBeInTheDocument();
 
     await act(async () => {
-      resolveResponse?.(
-        new Response(
-          JSON.stringify({
-            videoId: "gtEROmL0NzQ",
-            order: "time",
-            summary: {
-              topLevelCommentCount: 1504,
-              replyCount: 1122,
-              totalCommentCount: 2626,
+      streamController?.enqueue(
+        encoder.encode(
+          `${JSON.stringify({
+            type: "success",
+            result: {
+              videoId: "gtEROmL0NzQ",
+              order: "time",
+              summary: {
+                topLevelCommentCount: 1504,
+                replyCount: 1122,
+                totalCommentCount: 2626,
+              },
+              files: {
+                jsonUrl: "https://blob.example/json",
+                threadedExcelUrl: "https://blob.example/threaded",
+                flatExcelUrl: "https://blob.example/flat",
+              },
             },
-            files: {
-              jsonUrl: "https://blob.example/json",
-              threadedExcelUrl: "https://blob.example/threaded",
-              flatExcelUrl: "https://blob.example/flat",
-            },
-          }),
-          {
-            status: 200,
-            headers: { "content-type": "application/json" },
-          },
+          })}\n`,
         ),
       );
+      streamController?.close();
       await Promise.resolve();
     });
 
@@ -109,30 +172,51 @@ describe("export flow", () => {
   });
 
   it("submits export and shows download links", async () => {
+    const encoder = new TextEncoder();
+
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () =>
-        new Response(
-          JSON.stringify({
-            videoId: "gtEROmL0NzQ",
-            order: "time",
-            summary: {
-              topLevelCommentCount: 1504,
-              replyCount: 1122,
-              totalCommentCount: 2626,
+      vi.fn(async () => {
+        const body =
+          `${JSON.stringify({
+            type: "progress",
+            progress: {
+              stage: "fetching-comments",
+              title: "正在请求评论数据",
+              detail: "已获取第 1 页评论线程，继续向后补齐。",
             },
-            files: {
-              jsonUrl: "https://blob.example/json",
-              threadedExcelUrl: "https://blob.example/threaded",
-              flatExcelUrl: "https://blob.example/flat",
+          })}\n` +
+          `${JSON.stringify({
+            type: "success",
+            result: {
+              videoId: "gtEROmL0NzQ",
+              order: "time",
+              summary: {
+                topLevelCommentCount: 1504,
+                replyCount: 1122,
+                totalCommentCount: 2626,
+              },
+              files: {
+                jsonUrl: "https://blob.example/json",
+                threadedExcelUrl: "https://blob.example/threaded",
+                flatExcelUrl: "https://blob.example/flat",
+              },
+            },
+          })}\n`;
+
+        return new Response(
+          new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(body));
+              controller.close();
             },
           }),
           {
             status: 200,
-            headers: { "content-type": "application/json" },
+            headers: { "content-type": "text/plain; charset=utf-8" },
           },
-        ),
-      ),
+        );
+      }),
     );
 
     render(<HomePage />);

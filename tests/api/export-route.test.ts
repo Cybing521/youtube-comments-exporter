@@ -115,7 +115,7 @@ describe("POST /api/export", () => {
     ).rejects.toThrow("人机验证主机名不匹配，请刷新后重试");
   });
 
-  it("returns 500 when turnstile upstream verification is unavailable", async () => {
+  it("streams an error event when turnstile upstream verification is unavailable", async () => {
     vi.resetModules();
     vi.doMock("../../lib/handle-export-request", () => ({
       handleExportRequest: async () => {
@@ -138,9 +138,75 @@ describe("POST /api/export", () => {
       })
     );
 
-    expect(response.status).toBe(500);
-    expect(await response.json()).toEqual({
-      error: "人机验证服务暂时不可用，请稍后再试"
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("人机验证服务暂时不可用，请稍后再试");
+
+    vi.doUnmock("../../lib/handle-export-request");
+    vi.resetModules();
+  });
+
+  it("streams progress and success events from the export route", async () => {
+    vi.resetModules();
+    vi.doMock("../../lib/handle-export-request", () => ({
+      handleExportRequest: async (_body: unknown, _dependencies: unknown, options?: { onProgress?: (event: unknown) => void }) => {
+        options?.onProgress?.({
+          stage: "fetching-comments",
+          title: "正在请求评论数据",
+          detail: "已获取第 1 页评论线程，继续向后补齐。"
+        });
+
+        return {
+          videoId: "gtEROmL0NzQ",
+          order: "time",
+          summary: {
+            topLevelCommentCount: 1504,
+            replyCount: 1122,
+            totalCommentCount: 2626
+          },
+          files: {
+            jsonUrl: "https://blob.example.com/gtEROmL0NzQ.time.comments.json",
+            threadedExcelUrl: "https://blob.example.com/gtEROmL0NzQ.time.comments.xlsx",
+            flatExcelUrl: "https://blob.example.com/gtEROmL0NzQ.time.comments.flat.xlsx"
+          }
+        };
+      }
+    }));
+
+    const { POST } = await import("../../app/api/export/route");
+    const response = await POST(
+      new Request("https://www.cybing.top/api/export", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          url: "https://www.youtube.com/watch?v=gtEROmL0NzQ",
+          apiKey: "AIza-user",
+          turnstileToken: "turnstile-token"
+        })
+      })
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toContain("text/plain");
+
+    const body = await response.text();
+    const events = body
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line) as { type: string; progress?: { title: string }; result?: { videoId: string } });
+
+    expect(events[0]).toMatchObject({
+      type: "progress",
+      progress: {
+        title: "正在请求评论数据"
+      }
+    });
+    expect(events[1]).toMatchObject({
+      type: "success",
+      result: {
+        videoId: "gtEROmL0NzQ"
+      }
     });
 
     vi.doUnmock("../../lib/handle-export-request");

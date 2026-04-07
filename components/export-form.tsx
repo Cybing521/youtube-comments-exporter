@@ -3,10 +3,11 @@
 import React from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { submitExportRequest } from "../lib/export-request";
-import type { ExportResponse } from "../lib/export-types";
+import type { ExportProgressEvent, ExportResponse } from "../lib/export-types";
 
 interface ExportFormProps {
   onStart: () => void;
+  onProgress: (progress: ExportProgressEvent) => void;
   onSuccess: (result: ExportResponse) => void;
   onError: (message: string) => void;
 }
@@ -28,7 +29,7 @@ function validateYouTubeUrl(url: string) {
   return null;
 }
 
-export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
+export function ExportForm({ onStart, onProgress, onSuccess, onError }: ExportFormProps) {
   const [url, setUrl] = React.useState("");
   const [apiKey, setApiKey] = React.useState("");
   const [turnstileToken, setTurnstileToken] = React.useState("");
@@ -88,6 +89,8 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
         apiKey,
         turnstileToken,
         order: "time",
+      }, {
+        onProgress,
       });
       onSuccess(result);
     } catch (error) {
@@ -106,23 +109,11 @@ export function ExportForm({ onStart, onSuccess, onError }: ExportFormProps) {
       </div>
       <section className="quickstart-panel" aria-label="第一次使用引导">
         <div className="quickstart-copy">
-          <p className="helper-text">
-            这个页面只做一件事：把一个公开视频链接变成结构化数据文件。你只需要准备自己的 API key 和一次验证。
-          </p>
-        </div>
-        <div className="quickstart-grid">
-          <article className="quickstart-card">
-            <strong>01</strong>
-            <span>准备一个公开视频链接</span>
-          </article>
-          <article className="quickstart-card">
-            <strong>02</strong>
-            <span>填入你自己的 YouTube API key</span>
-          </article>
-          <article className="quickstart-card">
-            <strong>03</strong>
-            <span>完成人机验证并开始导出</span>
-          </article>
+          <div className="quickstart-inline">
+            <span>贴链接</span>
+            <span>填 API key</span>
+            <span>开始导出</span>
+          </div>
         </div>
         <div className="quickstart-actions">
           <button

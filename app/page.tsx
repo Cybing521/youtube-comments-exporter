@@ -4,12 +4,13 @@ import React from "react";
 import { CopyEmailButton } from "@/components/copy-email-button";
 import { ExportForm } from "@/components/export-form";
 import { ExportResults } from "@/components/export-results";
-import type { ExportResponse } from "@/lib/export-types";
+import type { ExportProgressEvent, ExportResponse } from "@/lib/export-types";
 
 export default function HomePage() {
   const [status, setStatus] = React.useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = React.useState<string>("");
   const [result, setResult] = React.useState<ExportResponse | null>(null);
+  const [progress, setProgress] = React.useState<ExportProgressEvent | null>(null);
 
   return (
     <main className="page-shell">
@@ -20,16 +21,16 @@ export default function HomePage() {
         <div className="hero-content">
           <div className="hero-main">
             <h1>YouTube 评论导出</h1>
-            <p className="lead">贴一个公开视频链接，填入自己的 API key，就能在线拿到 JSON、分层 Excel 和扁平 Excel。</p>
+            <p className="lead">贴链接，填 API key，等导出完成后直接下载 JSON 和 Excel。</p>
             <div className="hero-badges" aria-label="功能亮点">
               <span>单视频导出</span>
-              <span>更适合研究 / 运营 / 内容分析</span>
+              <span>研究 / 运营 / 内容分析</span>
               <span>结果页适合直接截图分享</span>
             </div>
           </div>
-          <aside className="hero-sidecard" aria-label="快速价值说明">
-            <strong>第一次来也能直接用</strong>
-            <p>三步完成：填链接、贴 API key、做人机验证。导出完成后就能直接下载，或者截图发给别人。</p>
+          <aside className="hero-sidecard" aria-label="快速步骤">
+            <strong>贴链接 → 填 API key → 开始导出</strong>
+            <p>导出完成后会直接出现 JSON、分层 Excel 和扁平 Excel 下载入口。</p>
           </aside>
         </div>
       </section>
@@ -38,17 +39,21 @@ export default function HomePage() {
           setStatus("loading");
           setError("");
           setResult(null);
+          setProgress(null);
         }}
+        onProgress={(nextProgress) => setProgress(nextProgress)}
         onSuccess={(nextResult) => {
           setStatus("success");
           setResult(nextResult);
+          setProgress(null);
         }}
         onError={(message) => {
           setStatus("error");
           setError(message);
+          setProgress(null);
         }}
       />
-      <ExportResults status={status} error={error} result={result} />
+      <ExportResults status={status} error={error} result={result} progress={progress} />
     </main>
   );
 }

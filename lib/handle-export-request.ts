@@ -1,18 +1,19 @@
 import { runExportAndUpload, type ExportJobInput, type ExportJobResult } from "./export-service";
-import type { ExportRequestInput } from "./export-types";
+import type { ExportProgressEvent, ExportRequestInput } from "./export-types";
 import { verifyTurnstileToken } from "./turnstile";
 
 interface ExportRouteDependencies {
-  exportArtifacts: (input: ExportJobInput) => Promise<ExportJobResult>;
+  exportArtifacts: (input: ExportJobInput, options?: { onProgress?: (event: ExportProgressEvent) => void }) => Promise<ExportJobResult>;
   verifyTurnstile: (token: string) => Promise<{ success: boolean; hostname?: string }>;
 }
 
 interface ExportRouteOptions {
   expectedHostname?: string;
+  onProgress?: (event: ExportProgressEvent) => void;
 }
 
 const defaultDependencies: ExportRouteDependencies = {
-  exportArtifacts: runExportAndUpload,
+  exportArtifacts: (input, options) => runExportAndUpload(input, undefined, options),
   verifyTurnstile: verifyTurnstileToken,
 };
 
@@ -43,6 +44,12 @@ export async function handleExportRequest(
     throw new Error("缺少 YouTube 链接");
   }
 
+  options.onProgress?.({
+    stage: "validating",
+    title: "正在校验输入信息",
+    detail: "正在确认链接、API key 和安全验证信息。",
+  });
+
   const apiKey = resolveApiKey(body.apiKey);
   const turnstileToken = resolveTurnstileToken(body.turnstileToken);
   const turnstileResult = await dependencies.verifyTurnstile(turnstileToken);
@@ -58,9 +65,14 @@ export async function handleExportRequest(
     throw new Error("人机验证主机名不匹配，请刷新后重试");
   }
 
-  return dependencies.exportArtifacts({
-    url: body.url.trim(),
-    apiKey,
-    order: body.order ?? "time",
-  });
+  return dependencies.exportArtifacts(
+    {
+      url: body.url.trim(),
+      apiKey,
+      order: body.order ?? "time",
+    },
+    {
+      onProgress: options.onProgress,
+    },
+  );
 }
