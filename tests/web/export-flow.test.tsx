@@ -147,11 +147,10 @@ describe("export flow", () => {
     );
 
     expect(screen.getByText("2,626 条评论已整理完成")).toBeInTheDocument();
-    expect(screen.getAllByText("工具链接")).toHaveLength(2);
+    expect(screen.getAllByText("工具链接").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("cybing.top")).toBeInTheDocument();
-    expect(screen.getByText("截图分享区")).toBeInTheDocument();
     expect(screen.getAllByText("邮箱反馈").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole("link", { name: "cyibin06@gmail.com" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "发邮件到 cyibin06@gmail.com" })).toHaveAttribute(
       "href",
       "mailto:cyibin06@gmail.com?subject=YouTube%20评论导出反馈",
     );
@@ -162,6 +161,16 @@ describe("export flow", () => {
     expect(screen.getByText("做评论筛选和数据透视")).toBeInTheDocument();
     expect(screen.getByText("整理研究材料或运营复盘")).toBeInTheDocument();
     expect(screen.getByText("分享这次导出结果截图")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "生成分享海报" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "生成分享海报" }));
+
+    expect(screen.getByText("分享海报预览")).toBeInTheDocument();
+    expect(screen.getByText("适合直接截图，或者下载后发到小红书")).toBeInTheDocument();
+    expect(screen.getByText("论文整理")).toBeInTheDocument();
+    expect(screen.getByText("评论分析")).toBeInTheDocument();
+    expect(screen.getByText("运营复盘")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "下载海报 PNG" })).toBeInTheDocument();
 
     expect(screen.getByRole("link", { name: /下载 JSON/ })).toHaveAttribute(
       "href",

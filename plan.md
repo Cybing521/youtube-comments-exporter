@@ -37,7 +37,13 @@
 - 强化总评论数、一级评论数、回复数
 - 让成功结果更适合截图传播
 
-### Phase 5: Final Verification
+### Phase 5: Share Poster
+
+- 在导出成功后提供 `生成分享海报` 动作
+- 生成单独的纵向传播海报，而不是继续拉长结果页
+- 提供下载 PNG 的能力
+
+### Phase 6: Final Verification
 
 - `pnpm test`
 - `pnpm build`
@@ -53,4 +59,4 @@
 
 ## Immediate Next Step
 
-先完成仓库收缩，再做首页和结果页体验升级。
+先继续把“导出完成后的传播动作”做完整，再考虑更深的分享链路。
