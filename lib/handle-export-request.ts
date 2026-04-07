@@ -1,12 +1,19 @@
 import { runExportAndUpload, type ExportJobInput, type ExportJobResult } from "./export-service";
 import type { ExportRequestInput } from "./export-types";
+import { verifyTurnstileToken } from "./turnstile";
 
 interface ExportRouteDependencies {
   exportArtifacts: (input: ExportJobInput) => Promise<ExportJobResult>;
+  verifyTurnstile: (token: string) => Promise<{ success: boolean; hostname?: string }>;
+}
+
+interface ExportRouteOptions {
+  expectedHostname?: string;
 }
 
 const defaultDependencies: ExportRouteDependencies = {
   exportArtifacts: runExportAndUpload,
+  verifyTurnstile: verifyTurnstileToken,
 };
 
 function resolveApiKey(providedApiKey?: string) {
@@ -15,25 +22,45 @@ function resolveApiKey(providedApiKey?: string) {
     return explicitKey;
   }
 
-  const envKey = process.env.YOUTUBE_API_KEY?.trim();
-  if (envKey) {
-    return envKey;
+  throw new Error("请输入 YouTube API Key");
+}
+
+function resolveTurnstileToken(providedToken?: string) {
+  const explicitToken = providedToken?.trim();
+  if (explicitToken) {
+    return explicitToken;
   }
 
-  throw new Error("服务端未配置 YOUTUBE_API_KEY");
+  throw new Error("请先完成人机验证");
 }
 
 export async function handleExportRequest(
-  body: Partial<ExportRequestInput> & { apiKey?: string },
+  body: Partial<ExportRequestInput>,
   dependencies: ExportRouteDependencies = defaultDependencies,
+  options: ExportRouteOptions = {},
 ) {
   if (!body.url?.trim()) {
     throw new Error("缺少 YouTube 链接");
   }
 
+  const apiKey = resolveApiKey(body.apiKey);
+  const turnstileToken = resolveTurnstileToken(body.turnstileToken);
+  const turnstileResult = await dependencies.verifyTurnstile(turnstileToken);
+
+  if (!turnstileResult.success) {
+    throw new Error("人机验证未通过，请重试");
+  }
+
+  const verifiedHostname = turnstileResult.hostname?.trim().toLowerCase();
+  const expectedHostname = options.expectedHostname?.trim().toLowerCase();
+
+  if (expectedHostname && verifiedHostname !== expectedHostname) {
+    throw new Error("人机验证主机名不匹配，请刷新后重试");
+  }
+
   return dependencies.exportArtifacts({
     url: body.url.trim(),
-    apiKey: resolveApiKey(body.apiKey),
+    apiKey,
     order: body.order ?? "time",
   });
 }

@@ -152,6 +152,21 @@ input:disabled {
   transform: translateY(-1px);
 }
 
+.verification-field {
+  gap: 10px;
+}
+
+.turnstile-shell {
+  display: flex;
+  align-items: center;
+  min-height: 74px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.82);
+  overflow-x: auto;
+}
+
 .primary-button {
   min-height: 54px;
   border: 0;

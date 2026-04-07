@@ -4,15 +4,16 @@
 
 - A GitHub repository for this project
 - A Vercel account
-- A YouTube Data API key
+- A Cloudflare account with Turnstile enabled
 - A Vercel Blob store created in the target project
 
 ## Environment Variables
 
 Set these variables in Vercel Project Settings -> Environment Variables:
 
-- `YOUTUBE_API_KEY`
 - `BLOB_READ_WRITE_TOKEN`
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+- `TURNSTILE_SECRET_KEY`
 
 For local development:
 
@@ -27,11 +28,17 @@ cp .env.example .env.local
 3. Import the GitHub repository
 4. Leave `Root Directory` empty. The repository root is the actual Next.js application root.
 5. Set environment variables:
-   - `YOUTUBE_API_KEY`
    - `BLOB_READ_WRITE_TOKEN`
-6. Deploy to the default `vercel.app` URL
-7. Open the production deployment and verify the homepage renders in Chinese
-8. Submit one real export request and confirm all three files are downloadable
+   - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+   - `TURNSTILE_SECRET_KEY`
+6. In Cloudflare Turnstile, create a widget and add every host you actually serve this app from, including your production domain and `localhost`
+7. Deploy to the default `vercel.app` URL
+8. Open the production deployment and verify the homepage renders in Chinese
+9. Submit one real export request with:
+   - a YouTube video URL
+   - the end user's own YouTube Data API key
+   - a completed Turnstile challenge
+10. Confirm all three files are downloadable
 
 ## Optional Custom Domain
 
@@ -47,11 +54,12 @@ cp .env.example .env.local
 1. GitHub -> create or open the target repository
 2. Vercel -> `Add New Project`
 3. Import the repository
-4. In `Settings -> Environment Variables`, add the two required variables
+4. In `Settings -> Environment Variables`, add the three required variables
 5. Trigger the first production deployment
 6. In `Storage -> Blob`, verify the project has Blob enabled
-7. In `Domains`, add your production domain
-8. Re-run one export from the production domain
+7. In Cloudflare Turnstile, add your production domain
+8. In `Domains`, add your production domain
+9. Re-run one export from the production domain
 
 ## Verification Checklist
 
@@ -59,6 +67,9 @@ cp .env.example .env.local
 - `pnpm build`
 - Open the default `vercel.app` domain
 - Verify the homepage renders in Chinese
+- Verify the page asks for a user-provided YouTube API key
+- Verify the Turnstile widget loads successfully
+- Verify Turnstile is configured for the same hostname the request is sent from
 - Submit one export request
 - Confirm all three generated files can be downloaded
 - Switch the production domain

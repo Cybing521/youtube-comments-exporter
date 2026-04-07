@@ -11,7 +11,8 @@
 ## Features
 
 - 中文界面，适合直接给非技术用户使用
-- 公开网页只输入视频链接，API Key 保留在服务端环境变量
+- 用户自己填写 YouTube Data API key，站点不代付配额
+- 集成 Cloudflare Turnstile 人机验证
 - 支持一级评论和回复评论
 - 生成三种导出产物
 - 支持 Vercel Blob 上传和在线下载能力
@@ -38,8 +39,9 @@ cp .env.example .env.local
 然后在 `.env.local` 里填写：
 
 ```bash
-YOUTUBE_API_KEY=your_youtube_data_api_key
 BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+TURNSTILE_SECRET_KEY=your_turnstile_secret_key
 ```
 
 ## Local Development
@@ -50,7 +52,11 @@ pnpm dev
 ```
 
 打开 [http://localhost:3000](http://localhost:3000)。
-页面只需要输入 YouTube 链接；`YOUTUBE_API_KEY` 由服务端读取。
+页面需要输入：
+
+- YouTube 视频链接
+- 用户自己的 YouTube Data API key
+- Cloudflare Turnstile 验证
 
 ## Testing
 
@@ -72,11 +78,13 @@ pnpm build
 2. 在 Vercel 中 `Add New Project` 并导入仓库。
 3. 保持 `Root Directory` 为空，直接使用仓库根目录作为 Next.js 应用根目录。
 4. 配置环境变量：
-   - `YOUTUBE_API_KEY`
    - `BLOB_READ_WRITE_TOKEN`
+   - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+   - `TURNSTILE_SECRET_KEY`
 5. 在项目中启用 Vercel Blob，确保 `BLOB_READ_WRITE_TOKEN` 出现在环境变量中。
-6. 先完成一次默认 `*.vercel.app` 生产部署。
-7. 验证默认域名页面可打开，并能成功导出一次真实视频评论。
+6. 在 Cloudflare Turnstile 中把你的生产域名和本地域名加入允许名单。
+7. 先完成一次默认 `*.vercel.app` 生产部署。
+8. 验证默认域名页面可打开，并能在输入用户自己的 API key 后成功导出一次真实视频评论。
 
 ## Custom Domain Example
 
@@ -95,6 +103,7 @@ pnpm build
 - TypeScript 版评论导出核心
 - JSON / Excel 产物生成
 - `/api/export` 路由和服务端环境变量接入
+- 用户自填 API key + Turnstile 校验链路
 - 前端提交、导出结果摘要和下载交互
 - `README.md`、`.gitignore`、部署文档和环境变量文档
 
@@ -102,4 +111,5 @@ pnpm build
 
 - 在 Vercel 项目里确认 `Root Directory` 为空
 - 一次成功的 Vercel 生产部署
-- 用真实 YouTube 视频做一次线上导出验证
+- 在 Cloudflare Turnstile 后台补齐正式域名白名单
+- 用真实 YouTube 视频和用户自己的 API key 做一次线上导出验证

@@ -19,5 +19,7 @@ export interface ExportResponse {
 
 export interface ExportRequestInput {
   url: string;
+  apiKey: string;
+  turnstileToken: string;
   order?: "relevance" | "time";
 }

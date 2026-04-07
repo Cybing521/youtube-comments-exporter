@@ -8,6 +8,9 @@ function resolveErrorStatus(message: string) {
   if (
     message.startsWith("缺少") ||
     message.startsWith("请输入") ||
+    message.startsWith("请先") ||
+    message.startsWith("人机验证未通过") ||
+    message.startsWith("人机验证主机名不匹配") ||
     message.startsWith("无法从链接中提取")
   ) {
     return 400;
@@ -19,7 +22,9 @@ function resolveErrorStatus(message: string) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const result = await handleExportRequest(body);
+    const result = await handleExportRequest(body, undefined, {
+      expectedHostname: new URL(request.url).hostname,
+    });
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "导出失败";
