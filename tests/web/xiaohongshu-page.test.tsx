@@ -10,9 +10,10 @@ describe("xiaohongshu page", () => {
     render(<XiaohongshuPage />);
 
     expect(screen.getByText("小红书截图页")).toBeInTheDocument();
-    expect(screen.getByText("YouTube 评论终于能直接导出 Excel 了")).toBeInTheDocument();
-    expect(screen.getByText("以前最麻烦的地方")).toBeInTheDocument();
-    expect(screen.getByText("站点链接")).toBeInTheDocument();
+    expect(screen.getByText("我做了个网站")).toBeInTheDocument();
+    expect(screen.getByText("以前最麻烦的")).toBeInTheDocument();
+    expect(screen.getByText("工具地址")).toBeInTheDocument();
+    expect(screen.getByText("封面")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "返回主站" })).toHaveAttribute("href", "/");
   });
 });
