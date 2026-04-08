@@ -59,6 +59,11 @@ input:disabled {
   --promo-line: rgba(213, 75, 99, 0.14);
 }
 
+.promo-shell-shot {
+  width: min(980px, calc(100vw - 48px));
+  padding: 24px 0;
+}
+
 .promo-intro {
   display: flex;
   align-items: end;
@@ -139,6 +144,11 @@ input:disabled {
   gap: 20px;
 }
 
+.promo-grid-shot {
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
 .promo-card {
   display: grid;
   gap: 18px;
@@ -167,6 +177,11 @@ input:disabled {
     linear-gradient(180deg, rgba(255, 251, 247, 0.99), rgba(255, 234, 238, 0.96));
 }
 
+.promo-card-shot {
+  width: min(100%, 860px);
+  aspect-ratio: 3 / 4;
+}
+
 @media (min-width: 1040px) {
   .promo-card-featured {
     grid-column: span 2;
@@ -185,6 +200,25 @@ input:disabled {
   .promo-card-featured .promo-card-subtitle {
     font-size: 1.28rem;
   }
+
+  .promo-card-shot.promo-card-featured {
+    grid-column: auto;
+    width: min(100%, 860px);
+    aspect-ratio: 3 / 4;
+  }
+
+  .promo-card-shot.promo-card-featured .promo-card-body {
+    max-width: none;
+    align-content: start;
+  }
+
+  .promo-card-shot.promo-card-featured h2 {
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+  }
+
+  .promo-card-shot.promo-card-featured .promo-card-subtitle {
+    font-size: 1.16rem;
+  }
 }
 
 .promo-card-top,
@@ -195,7 +229,6 @@ input:disabled {
   gap: 12px;
 }
 
-.promo-chip,
 .promo-site,
 .promo-card-footer span {
   display: inline-flex;
@@ -216,18 +249,6 @@ input:disabled {
   align-content: start;
   margin-top: auto;
   margin-bottom: auto;
-}
-
-.promo-card-eyebrow {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(213, 75, 99, 0.1);
-  color: var(--promo-accent);
-  font-size: 0.78rem;
-  font-weight: 800;
 }
 
 .promo-card h2 {
